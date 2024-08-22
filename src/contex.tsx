@@ -1,30 +1,40 @@
-import { ProductEntity } from "feeef/src/core/core";
 import React, { createContext, useState } from "react";
 import { LocalOrderItem } from "./pishop/models";
 
-// Define the shape of the cart context
 interface CartContextType {
   cartItems: LocalOrderItem[];
   addToCart: (item: LocalOrderItem) => void;
-  removeFromCart?: (index: number) => void;
+  removeFromCart: (index: number) => void;
 }
 
-// Create the cart context
 export const CartContext = createContext<CartContextType>({
   cartItems: [],
-  addToCart: () => {},
-  removeFromCart: () => {},
+  addToCart: () => {
+    throw new Error(
+      "CartProvider not found. Make sure to wrap your components with CartProvider."
+    );
+  },
+  removeFromCart: () => {
+    console.warn(
+      "removeFromCart function is not implemented in the default context value."
+    );
+  },
 });
 
-// Create the cart provider component
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [cartItems, setCartItems] = useState<LocalOrderItem[]>([]);
+  const [cartItems, setCartItems] = useState<LocalOrderItem[]>(() => {
+    const cartString = localStorage.getItem("cart");
+    return cartString ? JSON.parse(cartString) : [];
+  });
 
   const addToCart = (item: LocalOrderItem) => {
-    setCartItems((prevItems) => [...prevItems, item]);
-    localStorage.setItem("cart", JSON.stringify([...cartItems, item]));
+    setCartItems((prevItems) => {
+      const updatedItems = [...prevItems, item];
+      localStorage.setItem("cart", JSON.stringify(updatedItems));
+      return updatedItems;
+    });
   };
   const removeFromCart = (index: number) => {
     const array = [...cartItems];
