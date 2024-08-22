@@ -39,7 +39,7 @@ function ProductPage() {
         store: StoreEntity
     };
     let pathname = useLocation().pathname
-
+    
 
     return <>
         <SuperSEO

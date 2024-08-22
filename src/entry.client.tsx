@@ -8,6 +8,7 @@ import {
 
 import { routes } from "./App";
 import { setCurrentHost } from "./feeef";
+import { CartProvider } from "./contex";
 
 hydrate();
 
@@ -32,10 +33,11 @@ async function hydrate() {
 
   setCurrentHost(window.location.href);
 
-  ReactDOM.createRoot(
-    document.getElementById("app")!).render(
+  ReactDOM.createRoot(document.getElementById("app")!).render(
     <React.StrictMode>
-      <RouterProvider router={router} fallbackElement={null} />
+      <CartProvider>
+        <RouterProvider router={router} fallbackElement={null} />
+      </CartProvider>
     </React.StrictMode>
   );
 }

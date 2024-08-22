@@ -1,32 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { IconBrightness } from "@tabler/icons-react";
 import { StoreEntity } from "feeef/src/core/core";
 import { track } from "../../pishop/helpers";
 import { IconShoppingBagCheck } from "@tabler/icons-react";
 import Cart from "../../components/Cart";
+import { CartContext } from "../../contex";
+
 // import { IoCartOutline } from "react-icons/io5";
 function Navbar({ store }: { store: StoreEntity }) {
   const [open, setOpen] = React.useState(false);
-  const Stringcart =
-    typeof window !== "undefined" ? localStorage.getItem("cart") : "[]";
-  const cart = JSON.parse(Stringcart || "[]");
-
-  const [cartlength, setCartLength] = React.useState(0);
-  useEffect(() => {
-    // setArray(array);
-    setCartLength(cart.length);
-  }, [cartlength]);
+  const { cartItems } = useContext(CartContext) || {};
+  const cartlength = cartItems.length;
 
   return (
     <>
-      <Cart
-        active={open}
-        setCartLength={setCartLength}
-        length={cartlength}
-        setActive={setOpen}
-        cart={cart}
-      />
+      <Cart active={open} setActive={setOpen} />
       <div className="h-16"></div>
       <nav className="backdrop-blur-xl bg-opacity-40 dark:bg-opacity-40 bg-gray-50 dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-opacity-20 dark:border-opacity-30 border-gray-600">
         {store?.banner?.enabled && (
