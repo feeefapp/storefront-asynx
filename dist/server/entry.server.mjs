@@ -3502,7 +3502,7 @@ var _storeProducts = {};
 async function getStore(host) {
   if (_stores[host] && false)
     return _stores[host];
-  const isFeeefShop = host.includes(".feeef.store") || host.includes(".feeef.app") || host.includes(".lvh.me");
+  const isFeeefShop = host.includes(".feeef.store") || host.includes(".feeef.app") || host.includes(".khfif.shop") || host.includes(".lvh.me");
   var store = await ff.stores.find({
     id: isFeeefShop ? host.split(".")[0] : host,
     by: isFeeefShop ? "slug" : "domain.name"
