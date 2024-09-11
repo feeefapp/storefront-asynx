@@ -23,7 +23,7 @@ import {
   ProductEntity,
   StoreEntity,
   VariantOptionType,
-} from "feeef/src/core/core";
+} from "feeef";
 // import { setAdvancedMatching } from "../main";
 import { ShippingForm } from "../components/shipping_form";
 import { IconShoppingBag } from "@tabler/icons-react";

@@ -1,5 +1,5 @@
 
-import { ProductEntity, StoreEntity } from "feeef/src/core/core";
+import { ProductEntity, StoreEntity } from "feeef";
 import { ff } from "./feeef"
 var _stores: Record<string, StoreEntity> = {};
 var _products: Record<string, ProductEntity> = {};
@@ -7,8 +7,10 @@ var _storeProducts: Record<string, ProductEntity[]> = {};
 
 export async function getStore(host: string): Promise<StoreEntity> {
     if (_stores[host] && !import.meta.env.SSR) return _stores[host];
-    // if contains XXX.feeef.shop use slug, else domain.name
-    const isFeeefShop = host.includes(".feeef.shop")
+    // if contains XXX.feeef.store use slug, else domain.name
+    const isFeeefShop = 
+           host.includes(".feeef.store")
+        || host.includes(".feeef.app")
         || host.includes(".khfif.shop")
         || host.includes(".lvh.me");
 
