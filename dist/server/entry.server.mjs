@@ -301,7 +301,7 @@ function Footer({ store }) {
       ". All rights reserved.",
       /* @__PURE__ */ jsx("br", {}),
       /* @__PURE__ */ jsxs("span", { className: "text-sm font-extralight", children: [
-        "created by ",
+        "أنشأ متجرك الإلكتروني مجانا على ",
         /* @__PURE__ */ jsx(
           "a",
           {
@@ -309,10 +309,10 @@ function Footer({ store }) {
             href: "https://feeef.app/?ref=footer_copyrights",
             target: "_blank",
             className: "text-primary",
-            children: "feeef®"
+            children: "feeef.app"
           }
         ),
-        " created your store. startig for free!"
+        " | جميع الحقوق  محفوظة"
       ] })
     ] }) })
   ] }) });
