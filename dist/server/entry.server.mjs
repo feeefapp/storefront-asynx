@@ -306,7 +306,7 @@ function Footer({ store }) {
           "a",
           {
             "aria-label": "feeef",
-            href: "https://feeef.net/?ref=footer_copyrights",
+            href: "https://feeef.app/?ref=footer_copyrights",
             target: "_blank",
             className: "text-primary",
             children: "feeef®"
@@ -2083,7 +2083,7 @@ function Thanks({ order, onDone }) {
           "a",
           {
             "aria-label": "تتبع حالة الطلب",
-            href: `https://track.feeef.net/track/${order.id}`,
+            href: `https://feeef.app/track/${order.id}`,
             target: "_blank",
             className: "text-blue-500",
             children: "تتبع حالة الطلب"
@@ -2757,6 +2757,15 @@ function Product({ store, product }) {
       cart.clear();
     }
   }
+  function getShippingPrice() {
+    var rate = null;
+    {
+      rate = getShippingRate();
+    }
+    if (rate === null)
+      return null;
+    return rate === 0 ? /* @__PURE__ */ jsx("span", { className: "text-green-500", children: "توصيل مجاني" }) : rate + " " + getCurrencySymbolByStore(store);
+  }
   function SendOrderButton({
     id,
     ref
@@ -3211,26 +3220,22 @@ function Product({ store, product }) {
                 ] }, _item.product.id)) : /* @__PURE__ */ jsx("tr", { className: "text-gray-600 text-center", children: /* @__PURE__ */ jsx("td", { colSpan: 4, className: "text-xs", children: "لا يوجد منتجات في السلة | إضغط على شراء وسترسل هذ المنتج فقط" }) }) }) }),
                 /* @__PURE__ */ jsx("div", { className: "h-2" })
               ] }),
-              /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center", children: [
-                /* @__PURE__ */ jsx("div", { className: "text-gray-600", children: "التوصيل" }),
-                /* @__PURE__ */ jsx("div", { className: "flex-grow" }),
-                /* @__PURE__ */ jsx("div", { className: "text-gray-600", children: /* @__PURE__ */ jsx("span", { className: "text-gray-600", children: (shipping == null ? void 0 : shipping.address.state) ? /* @__PURE__ */ jsx("span", {
-                  // cart.hasProduct(product.id) ?
-                  // cart.getShippingRate(
-                  //     shipping,
-                  //     store
-                  // ) :
-                  // (getShippingRate() || 0)
-                  children: (() => {
-                    var rate = null;
-                    {
-                      rate = getShippingRate();
-                    }
-                    return rate === 0 ? /* @__PURE__ */ jsx("span", { className: "text-green-500", children: "توصيل مجاني" }) : rate + " " + getCurrencySymbolByStore(store);
-                  })()
-                }) : /* @__PURE__ */ jsx("span", { children: "اختر الولاية" }) }) })
+              getShippingPrice() !== null && /* @__PURE__ */ jsxs(Fragment, { children: [
+                /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center", children: [
+                  /* @__PURE__ */ jsx("div", { className: "text-gray-600", children: "التوصيل" }),
+                  /* @__PURE__ */ jsx("div", { className: "flex-grow" }),
+                  /* @__PURE__ */ jsx("div", { className: "text-gray-600", children: /* @__PURE__ */ jsx("span", { className: "text-gray-600", children: (shipping == null ? void 0 : shipping.address.state) ? /* @__PURE__ */ jsx("span", {
+                    // cart.hasProduct(product.id) ?
+                    // cart.getShippingRate(
+                    //     shipping,
+                    //     store
+                    // ) :
+                    // (getShippingRate() || 0)
+                    children: getShippingPrice()
+                  }) : /* @__PURE__ */ jsx("span", { children: "اختر الولاية" }) }) })
+                ] }),
+                /* @__PURE__ */ jsx("div", { className: "h-2" })
               ] }),
-              /* @__PURE__ */ jsx("div", { className: "h-2" }),
               /* @__PURE__ */ jsxs("div", { className: "flex", children: [
                 /* @__PURE__ */ jsx("div", { className: "text-gray-600", children: /* @__PURE__ */ jsx("span", { className: "text-gray-600", children: "المجموع" }) }),
                 /* @__PURE__ */ jsx("div", { className: "flex-grow" }),
