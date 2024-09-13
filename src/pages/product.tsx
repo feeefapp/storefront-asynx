@@ -331,6 +331,21 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
         // console.log("order sent", response);
     }
 
+    function getShippingPrice() {
+        var rate: number | null = null;
+        if (false && cart.hasProduct(product.id)) {
+            rate = cart.getShippingRate(
+                shipping,
+                store
+            )
+        } else {
+            rate = getShippingRate();
+        }
+        if (rate === null)
+        return null;
+        return rate === 0 ? <span className="text-green-500">توصيل مجاني</span> : rate + " " + getCurrencySymbolByStore(store)
+    }
+
 
     function SendOrderButton({
         id,
@@ -857,42 +872,35 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                             <div className="h-2"></div></>
                                     }
                                     {/* shipping */}
-                                    <div className="flex items-center justify-center">
-                                        <div className="text-gray-600">
-                                            التوصيل
-                                        </div>
-                                        <div className="flex-grow"></div>
-                                        <div className="text-gray-600">
-                                            <span className="text-gray-600">{
-                                                shipping?.address.state ?
-                                                    <span>{
-                                                        // cart.hasProduct(product.id) ?
-                                                        // cart.getShippingRate(
-                                                        //     shipping,
-                                                        //     store
-                                                        // ) :
-                                                        // (getShippingRate() || 0)
+                                    {
+                                        getShippingPrice() !== null && <>
+                                            <div className="flex items-center justify-center">
+                                                <div className="text-gray-600">
+                                                    التوصيل
+                                                </div>
+                                                <div className="flex-grow"></div>
+                                                <div className="text-gray-600">
+                                                    <span className="text-gray-600">{
+                                                        shipping?.address.state ?
+                                                            <span>{
+                                                                // cart.hasProduct(product.id) ?
+                                                                // cart.getShippingRate(
+                                                                //     shipping,
+                                                                //     store
+                                                                // ) :
+                                                                // (getShippingRate() || 0)
 
-                                                        (() => {
-                                                            var rate: number | null = null;
-                                                            if (false && cart.hasProduct(product.id)) {
-                                                                rate = cart.getShippingRate(
-                                                                    shipping,
-                                                                    store
-                                                                )
-                                                            } else {
-                                                                rate = getShippingRate();
-                                                            }
-                                                            return rate === 0 ? <span className="text-green-500">توصيل مجاني</span> : rate + " " + getCurrencySymbolByStore(store)
-                                                        })()
+                                                                getShippingPrice()
 
+                                                            }</span>
+                                                            :
+                                                            <span>اختر الولاية</span>
                                                     }</span>
-                                                    :
-                                                    <span>اختر الولاية</span>
-                                            }</span>
-                                        </div>
-                                    </div>
-                                    <div className="h-2"></div>
+                                                </div>
+                                            </div>
+                                            <div className="h-2"></div>
+                                            </>
+                                        }
                                     {/* total */}
                                     <div className="flex">
                                         <div className="text-gray-600">
