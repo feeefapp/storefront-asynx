@@ -174,7 +174,7 @@ function Footer({ store }: { store: StoreEntity }) {
             <span className="text-sm font-extralight">
               created by <a 
                 aria-label="feeef"
-              href="https://feeef.net/?ref=footer_copyrights" target="_blank" className="text-primary">feeef®</a> created your store. startig for free!
+              href="https://feeef.app/?ref=footer_copyrights" target="_blank" className="text-primary">feeef®</a> created your store. startig for free!
             </span>
 
           </p>

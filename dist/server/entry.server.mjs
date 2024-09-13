@@ -2938,8 +2938,15 @@ function Product({ store, product }) {
       /* @__PURE__ */ jsx(Thanks, { store, order: sentOrder, onDone: clearOrder })
     ] }),
     /* @__PURE__ */ jsx("div", { className: "container mx-auto pt-4 ", children: /* @__PURE__ */ jsxs("div", { className: "flex flex-col md:flex-row", children: [
-      /* @__PURE__ */ jsxs(StickyBox, { offsetTop: 78 + (((_c = store == null ? void 0 : store.banner) == null ? void 0 : _c.enabled) ? 40 : 0), className: "top-0 md:top-[78px]  h-full w-full md:w-1/2", children: [
-        /* @__PURE__ */ jsx("div", { className: "overflow-hidden slider relative rounded-2xl", children: /* @__PURE__ */ jsx(
+      /* @__PURE__ */ jsxs(StickyBox, { offsetTop: 78 + (((_c = store == null ? void 0 : store.banner) == null ? void 0 : _c.enabled) ? 40 : 0), className: "top-0 md:top-[78px]  h-full w-full md:w-1/2 relative", children: [
+        /* @__PURE__ */ jsx("div", { className: "absolute z-10 mix-blend-exclusion invert h-10 w-10 m-4 pointer-events-none", children: /* @__PURE__ */ jsx(
+          "img",
+          {
+            src: "https://s3.feeef.app/feeef/assets/swipe-animation.gif",
+            className: ""
+          }
+        ) }),
+        /* @__PURE__ */ jsx("div", { className: "overflow-hidden slider  rounded-2xl", children: /* @__PURE__ */ jsx(
           "div",
           {
             className: "slides overflow-hidden",
@@ -2995,7 +3002,7 @@ function Product({ store, product }) {
             ) }, index))
           }
         ) }),
-        /* @__PURE__ */ jsx("div", { className: " bottom-0 w-full flex justify-center p-2 items-end pointer-events-none", children: product == null ? void 0 : product.media.map((media, index) => /* @__PURE__ */ jsx(
+        /* @__PURE__ */ jsx("div", { className: "flex-wrap bottom-0 w-full flex justify-center p-2 items-end pointer-events-none", children: product == null ? void 0 : product.media.map((media, index) => /* @__PURE__ */ jsx(
           "a",
           {
             className: "pointer-events-auto",
@@ -3005,12 +3012,12 @@ function Product({ store, product }) {
               "button",
               {
                 "aria-label": "صورة " + (product == null ? void 0 : product.name) + " " + index,
-                className: "overflow-hidden relative " + (selectedMediaIndex === index ? "border-primary border-[2px] w-16" : " w-14 border-[2px] dark:border-white border-white ") + " mx-1  shadow-xl aspect-square rounded-xl bg-white bg-opacity-100 hover:bg-opacity-100 focus:bg-opacity-100 overflow-hidden transition-all duration-500 ease-in-out",
+                className: "overflow-hidden relative " + (selectedMediaIndex === index ? "border-primary border-[2px] p-[2px]" : " border-[2px] dark:border-white border-white ") + " mx-1  shadow-xl   aspect-square w-14 rounded-xl bg-white bg-opacity-100 hover:bg-opacity-100 focus:bg-opacity-100 overflow-hidden transition-all duration-500 ease-in-out",
                 children: /* @__PURE__ */ jsx(
                   "img",
                   {
                     src: media,
-                    className: "overflow-hidden w-full h-full object-cover ",
+                    className: "overflow-hidden rounded-lg w-full h-full object-cover ",
                     alt: "صورة " + (product == null ? void 0 : product.name) + " " + index
                   }
                 )
