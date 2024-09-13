@@ -22,7 +22,7 @@ import { cart } from "../services/cart";
 import { getCurrencySymbolByStore } from "../widgets/product_card";
 import ReactGA from "react-ga4";
 export const generateOrderId = customAlphabet('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 12)
-const TRACKING_ID = "G-PHHZC0B2SR"; 
+const TRACKING_ID = "G-PHHZC0B2SR";
 var _cachedOrders: LocalOrder[] = [];
 export function getOrders() {
     _cachedOrders = JSON.parse(localStorage.orders || '[]')
@@ -46,7 +46,7 @@ function ProductPage() {
         // Send pageview with a custom path
 
         ReactGA.send({ hitType: "pageview", page: "/", title: (store.name + " | " + (product.name || "") + (!!product.title ? " - " + product.title : "")) });
-    
+
     }, [])
 
     let pathname = useLocation().pathname
@@ -514,8 +514,14 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                     <StickyBox offsetTop={
                         78
                         + (store?.banner?.enabled ? 40 : 0)
-                    } className="top-0 md:top-[78px]  h-full w-full md:w-1/2">
-                        <div className="overflow-hidden slider relative rounded-2xl">
+                    } className="top-0 md:top-[78px]  h-full w-full md:w-1/2 relative">
+                        <div className="absolute z-10 mix-blend-exclusion invert h-10 w-10 m-4 pointer-events-none">
+                            <img src="https://s3.feeef.app/feeef/assets/swipe-animation.gif"
+                                className="" />
+                        </div>
+                        <div className="overflow-hidden slider  rounded-2xl">
+                            {/* <img src="https://s3.feeef.app/feeef/assets/swipe-animation.gif" style="position: absolute;z-index: 9;mix-blend-mode: exclusion;filter: invert();height: 35px;width: 35px;margin: 1rem;"> */}
+
 
                             <div
                                 className="slides overflow-hidden"
@@ -583,29 +589,29 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                 }
                             </div>
                         </div>
-                            <div className=" bottom-0 w-full flex justify-center p-2 items-end pointer-events-none">
+                        <div className="flex-wrap bottom-0 w-full flex justify-center p-2 items-end pointer-events-none">
 
-                                {product?.media.map((media, index) => (
-                                    <a
-                                        className="pointer-events-auto"
-                                        key={index}
-                                        href={`#slide-${index + 1}`}
+                            {product?.media.map((media, index) => (
+                                <a
+                                    className="pointer-events-auto"
+                                    key={index}
+                                    href={`#slide-${index + 1}`}
+                                    aria-label={"صورة " + product?.name + " " + index}
+                                >
+                                    <button
                                         aria-label={"صورة " + product?.name + " " + index}
-                                    >
-                                        <button
-                                            aria-label={"صورة " + product?.name + " " + index}
                                         key={index} className={'overflow-hidden relative ' +
                                             (selectedMediaIndex === index ?
-                                                "border-primary border-[2px] w-16" : " w-14 border-[2px] dark:border-white border-white ") +
-                                            " mx-1  shadow-xl aspect-square rounded-xl bg-white bg-opacity-100 hover:bg-opacity-100 focus:bg-opacity-100 overflow-hidden transition-all duration-500 ease-in-out"}>
-                                            <img src={media} className="overflow-hidden w-full h-full object-cover "
-                                                alt={"صورة " + product?.name + " " + index}
-                                            />
-                                        </button>
-                                    </a>
-                                ))}
+                                                "border-primary border-[2px] p-[2px]" : " border-[2px] dark:border-white border-white ") +
+                                            " mx-1  shadow-xl   aspect-square w-14 rounded-xl bg-white bg-opacity-100 hover:bg-opacity-100 focus:bg-opacity-100 overflow-hidden transition-all duration-500 ease-in-out"}>
+                                        <img src={media} className="overflow-hidden rounded-lg w-full h-full object-cover "
+                                            alt={"صورة " + product?.name + " " + index}
+                                        />
+                                    </button>
+                                </a>
+                            ))}
 
-                            </div>
+                        </div>
                     </StickyBox>
                     {/* detail */}
                     <div className="w-4"></div>
