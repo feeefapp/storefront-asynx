@@ -152,9 +152,8 @@ interface ShippingInfo {
     email?: string,
     address: EmbaddedAddress,
     doorShipping?: boolean,
+    shippingType: "home" | "pickup" | "store",
     notes?: string,
-    //
-    [key: string]: any,
 }
 
 interface LocalOrderItem {

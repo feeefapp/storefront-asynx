@@ -99,8 +99,6 @@ export function ShippingForm({ store, shipping, shippingMethod, setShipping, sen
 
     return (
         <div>
-            <h2 className="text-xl font-semibold flex">معلومات التوصيل</h2>
-            <div className="h-2"></div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
 
                 <div>
@@ -147,9 +145,9 @@ export function ShippingForm({ store, shipping, shippingMethod, setShipping, sen
                             onChange={handlePhoneChange}
                         // no outline forces
                         />
-                        {!isPhoneValid && <div className="bg-red-500 rounded-b-lg text-white text-xs w-full text-center">
+                        {/* {!isPhoneValid && <div className="bg-red-500 rounded-b-lg text-white text-xs w-full text-center">
                             {validatePhoneNumber(tryFixPhoneNumber(shipping.phone))}
-                        </div>}
+                        </div>} */}
                     </div>
                 </div>
                 <div>
@@ -267,9 +265,9 @@ export function ShippingForm({ store, shipping, shippingMethod, setShipping, sen
                 </div>
             </div>
             {
-                (shipping.doorShipping && store.metadata?.shipping?.mode !== "deskOnly"
-                    || !canShipToDesk
-                ) && canShipToHome &&
+                // (shipping.doorShipping && store.metadata?.shipping?.mode !== "deskOnly"
+                //     || !canShipToDesk
+                // ) && canShipToHome &&
                 <>
                     <div>
                         <span className="text-sm font-light">العنوان</span>
@@ -295,21 +293,24 @@ export function ShippingForm({ store, shipping, shippingMethod, setShipping, sen
                     || !canShipToDesk
                     || !canShipToHome
                     ? null :
-                    <span className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" onChange={() => {
-                            shipping.doorShipping = !shipping.doorShipping && canShipToHome;
-                            setShipping({ ...shipping })
-                        }} checked={shipping.doorShipping} className="sr-only peer" />
+                    <span className="relative inline-flex items-center cursor-pointer"  onClick={() => {
+                        shipping.doorShipping = !shipping.doorShipping;
+                        setShipping({ ...shipping })
+                    }}>
+                        <input type="checkbox" checked={shipping.doorShipping} className="sr-only peer" />
                         <div className="pulse w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-primary rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:m-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                         <div className="ms-3 flex flex-col">
                             <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
-                                {!shipping.doorShipping && "هل تريد "}التوصيل للبيت {!shipping.doorShipping && (<b dir="ltr">مقابل {getCurrencySymbolByStore(store)}{
+
+                                {!shipping.doorShipping && <>هل تريد التوصيل للبيت <b dir="ltr">مقابل {getCurrencySymbolByStore(store)}{
                                     getShippingRateForState({
                                         shippingMethod,
                                         store,
                                         state: shipping.address.state
                                     })?.home
-                                }</b>)}
+                                }</b></>}
+
+                                {shipping.doorShipping && "توصيل للبيت مفعل"}
                             </span>
                             {/* <span className="text-xs text-gray-500">حدد هذا الخيار إن كان لديك عنوان توصيل غير عنوانك الحالي</span> */}
                         </div>

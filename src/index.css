@@ -164,8 +164,14 @@ body {
 }
 
 
-
-
+/* PhotoView-Portal */
+.PhotoView-Portal {
+    direction: ltr !important;
+}
+.PhotoView-Slider__BannerWrap {
+    background-color: transparent !important;
+    background: linear-gradient(0deg,#0000,#00000091);
+  }
 /* slider */
 
 .slider {
@@ -273,7 +279,7 @@ body {
 
 /* Don't need button navigation */
 @supports(scroll-snap-type) {
-    .slider>a {
+    .slider > a {
         display: none;
     }
 }

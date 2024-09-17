@@ -21,6 +21,7 @@ import { ff, getCurrentUrl } from "../feeef";
 import { cart } from "../services/cart";
 import { getCurrencySymbolByStore } from "../widgets/product_card";
 import ReactGA from "react-ga4";
+import { PhotoProvider, PhotoView } from "react-photo-view";
 export const generateOrderId = customAlphabet('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 12)
 const TRACKING_ID = "G-PHHZC0B2SR";
 var _cachedOrders: LocalOrder[] = [];
@@ -84,6 +85,9 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
     const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
     const [mountPlayer, setMountPlayer] = useState(false);
 
+    // error data
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         if (product?.media.length) {
             var media = product.media[selectedMediaIndex];
@@ -119,7 +123,8 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
             },
             state: "16",
             zip: "",
-        }
+        },
+        shippingType: "home",
     });
 
 
@@ -204,22 +209,27 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
         return rate?.desk === undefined ? null : rate?.desk;
     }
 
-    function scrollToShippingForm() {
+    function scrollToShippingForm(withError: boolean = false) {
         var el = document.getElementById("order-form");
         el?.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-        el?.classList.add("pulse");
+        el?.classList.add(
+            withError ? " shake " :
+                "pulse"
+        );
         setTimeout(() => {
-            el?.classList.remove("pulse");
+            el?.classList.remove(withError ? " shake " : "pulse");
         }, 3000);
 
     }
 
     async function sendOrder(status: "draft" | "pending" = "pending") {
+        setError(null);
         // console.log("sending...");
         var validationError = validatePhoneNumber(tryFixPhoneNumber(shipping.phone));
         if (validationError) {
             // alert(validationError);
             // console.log("invalid phone number");
+            setError(validationError);
             return;
         }
         shipping.phone = tryFixPhoneNumber(shipping.phone);
@@ -263,6 +273,7 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
             shippingAddress: shipping.address.street,
             shippingCity: shipping.address.city,
             shippingState: shipping.address.state,
+            shippingType: shipping.shippingType,
             status: status,
             storeId: store.id,
             items: cart.hasProduct(product.id) ? cart.items : [
@@ -342,7 +353,7 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
             rate = getShippingRate();
         }
         if (rate === null)
-        return null;
+            return null;
         return rate === 0 ? <span className="text-green-500">توصيل مجاني</span> : rate + " " + getCurrencySymbolByStore(store)
     }
 
@@ -360,19 +371,22 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
             id={"send-order-btn-" + id}
             onClick={(e) => {
                 e.preventDefault();
-                sendOrder("pending")
+                sendOrder("pending");
+                scrollToShippingForm();
             }}
             type="submit" className="h-12 relative w-full text-white bg-primary focus:ring-2 focus:outline-none focus:ring-primary ring-opacity-30 font-medium rounded-lg text-sm px-4 py-2 text-center   ">
-            <AsynxWave
+            {/* <AsynxWave
                 color="white"
                 width="100%"
                 height="100%"
                 className={"absolute start-0 top-0 bottom-0 h-full aspect-square"}
-                padding={0} />
-            <div className="flex items-center justify-center" >
+                padding={0} /> */}
+            {/* <img class="absolute start-0 top-0 bottom-0 h-full aspect-square" src="https://s3.feeef.app/feeef/assets/click_animation.gif" style="filter: invert();mix-blend-mode: color-dodge;"> */}
+            <img src="https://s3.feeef.app/feeef/assets/click_animation.gif" className="absolute start-0 top-0 bottom-0 h-full aspect-square" style={{ filter: "invert()", mixBlendMode: "color-dodge" }} />
+            <div className="flex items-center justify-center text-xl" >
                 {/* أرسل طلبك الآن */}
                 <TypeAnimation cursor={true} sequence={[
-                    "شراء الآن",
+                    "...اشتري الآن",
                     2500,
                     "سنتصل بك لتأكيد الطلبية",
                     500,
@@ -384,11 +398,8 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                     500,
                 ]}
                     repeat={Infinity}
-                    speed={50}
+                    speed={80}
                 />
-                <span dir="ltr" className="mx-2 text-primary rounded-full px-2" style={{ backgroundColor: "var(--on-p)" }}>
-                    x{item.quantity}
-                </span>
             </div>
             {/* <div className="text-[12px] font-light">المبلغ الكلي مع التوصيل:
                 {
@@ -454,7 +465,7 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                 height="100%"
                                 className={"absolute start-0 top-0 bottom-0 h-full aspect-square"}
                                 padding={0} />
-                            <div className="flex items-center justify-center" >
+                            <div className="flex items-center justify-center text-xl" >
                                 {/* أرسل طلبك الآن */}
                                 <TypeAnimation cursor={true} sequence={[
                                     "شراء الآن",
@@ -523,9 +534,8 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
             }
             <div className="container mx-auto pt-4 ">
                 {/* row, 1 col for images, other for detail; all sticky */}
+                {/* images */}
                 <div className="flex flex-col md:flex-row">
-                    {/* images */}
-
                     <StickyBox offsetTop={
                         78
                         + (store?.banner?.enabled ? 40 : 0)
@@ -580,24 +590,27 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                                         || <img src={`https://img.youtube.com/vi/${getYoutubeVideoIdFromUrl(media)}/maxresdefault.jpg`} className="object-cover w-full h-full" />
                                                     }
                                                 </div> :
-                                                <img
-                                                    src={media} className={
-                                                        "inset-0 object-contain aspect-square"
-                                                    }
-                                                    alt={product.name!}
-                                                    style={{
-                                                        scrollSnapAlign: "center",
-                                                        scrollSnapStop: "always",
-                                                        // when this is selected scall to 1 else 0.4
-                                                        transform: selectedMediaIndex == index ? "scale(1)" : "scale(0.5)",
-                                                        transition: "all 0.6s cubic-bezier(.08,.82,.17,1)",
-                                                        borderRadius: selectedMediaIndex == index ? "0" : "100%",
-                                                        rotate: selectedMediaIndex == index ? "0deg" :
-                                                            selectedMediaIndex > index ? "30deg" : "-30deg",
-                                                        // more effacts
-                                                        opacity: selectedMediaIndex == index ? 1 : 0,
-                                                    }}
-                                                />
+                                                <PhotoView key={index} src={media}>
+
+                                                    <img
+                                                        src={media} className={
+                                                            "inset-0 object-contain aspect-square"
+                                                        }
+                                                        alt={product.name!}
+                                                        style={{
+                                                            scrollSnapAlign: "center",
+                                                            scrollSnapStop: "always",
+                                                            // when this is selected scall to 1 else 0.4
+                                                            transform: selectedMediaIndex == index ? "scale(1)" : "scale(0.5)",
+                                                            transition: "all 0.6s cubic-bezier(.08,.82,.17,1)",
+                                                            borderRadius: selectedMediaIndex == index ? "0" : "100%",
+                                                            rotate: selectedMediaIndex == index ? "0deg" :
+                                                                selectedMediaIndex > index ? "30deg" : "-30deg",
+                                                            // more effacts
+                                                            opacity: selectedMediaIndex == index ? 1 : 0,
+                                                        }}
+                                                    />
+                                                </PhotoView>
                                             }
                                         </div>
                                     ))
@@ -724,6 +737,16 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                             <div className="h-4"></div>
                             <div id="order-form" className="gb rounded-xl">
                                 <div className="p-4">
+                                    <h2 className="text-xl font-semibold flex">معلومات التوصيل</h2>
+                                    {/* display error when exists */}
+                                    {
+                                        error &&
+                                        <div className="text-red-500 text-sm p-2 bg-red-100 rounded-lg text-center">
+                                            {error}
+                                        </div>
+                                    }
+                                    <div className="h-2"></div>
+
                                     <ShippingForm
                                         shippingMethod={product.shippingMethod}
                                         store={store} shipping={shipping} setShipping={setShipping} sendOrder={sendOrder} />
@@ -734,11 +757,7 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                     </div>
                                     <div className="h-2"></div>
                                     <div className="flex items-center justify-center">
-                                        <div className="text-gray-600">
-                                            الكمية
-                                        </div>
-                                        <div className="flex-grow"></div>
-                                        <div className="flex items-center bg-gray-200 text-gray-700 justify-center border-2 rounded-lg overflow-hidden">
+                                        <div className="w-[50%] flex items-center bg-gray-200 text-gray-700 justify-center border-2 rounded-lg overflow-hidden">
                                             <button
                                                 aria-label="تقليل الكمية"
                                                 onClick={() => {
@@ -748,7 +767,7 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                                         quantity: prevItem.quantity > 1 ? prevItem.quantity - 1 : 1,
                                                     }));
                                                 }}
-                                                className="px-3 py-1 bg-gray-200 text-gray-700 rounded-s-lg"
+                                                className="w-full px-3 py-1 bg-gray-200 text-gray-700 rounded-s-lg"
                                             >
                                                 -
                                             </button>
@@ -765,45 +784,47 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                                         quantity: prevItem.quantity + 1,
                                                     }));
                                                 }}
-                                                className="px-3 py-1 "
+                                                className="w-full px-3 py-1 "
                                             >
                                                 +
                                             </button>
                                         </div>
                                         {/* add to cart */}
                                         <div className="w-2"></div>
-                                        {
-                                            !cart.canAddProduct(product) ? null :
-                                                !cart.hasProduct(product.id) ?
-                                                    <button
-                                                        aria-label="إضافة الى السلة"
-                                                        onClick={() => {
-                                                            cart.add({
-                                                                quantity: item.quantity,
-                                                                price: getPriceAfterDiscount(),
-                                                                variantPath: item.variants.join("/"),
-                                                                product: product,
-                                                            })
-                                                            // update the ui
-                                                            setItem({ ...item });
-                                                        }}
-                                                        className="px-3 py-1 rounded-lg border-2 border-primary text-primary"
-                                                    >
-                                                        إضافة إلى السلة
-                                                    </button>
-                                                    :
-                                                    <button
-                                                        aria-label="إزالة من السلة"
-                                                        onClick={() => {
-                                                            cart.removeProduct(product.id)
-                                                            // update the ui
-                                                            setItem({ ...item });
-                                                        }}
-                                                        className="px-3 py-1 rounded-lg border-2 border-red-500 text-red-500"
-                                                    >
-                                                        إزالة من السلة
-                                                    </button>
-                                        }
+                                        <div className="w-[50%]">
+                                            {
+                                                !cart.canAddProduct(product) ? null :
+                                                    !cart.hasProduct(product.id) ?
+                                                        <button
+                                                            aria-label="إضافة الى السلة"
+                                                            onClick={() => {
+                                                                cart.add({
+                                                                    quantity: item.quantity,
+                                                                    price: getPriceAfterDiscount(),
+                                                                    variantPath: item.variants.join("/"),
+                                                                    product: product,
+                                                                })
+                                                                // update the ui
+                                                                setItem({ ...item });
+                                                            }}
+                                                            className="w-full px-3 py-1 rounded-lg border-2 border-primary text-primary"
+                                                        >
+                                                            إضافة إلى السلة
+                                                        </button>
+                                                        :
+                                                        <button
+                                                            aria-label="إزالة من السلة"
+                                                            onClick={() => {
+                                                                cart.removeProduct(product.id)
+                                                                // update the ui
+                                                                setItem({ ...item });
+                                                            }}
+                                                            className="w-full px-3 py-1 rounded-lg border-2 border-red-500 text-red-500"
+                                                        >
+                                                            إزالة من السلة
+                                                        </button>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                                 {/* divider */}
@@ -899,8 +920,8 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                                 </div>
                                             </div>
                                             <div className="h-2"></div>
-                                            </>
-                                        }
+                                        </>
+                                    }
                                     {/* total */}
                                     <div className="flex">
                                         <div className="text-gray-600">

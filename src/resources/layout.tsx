@@ -5,7 +5,8 @@ import { dartColorToCss, initMetaPixel } from "../pishop/helpers";
 import { useEffect } from "react";
 import { Outlet, useLoaderData } from "react-router-dom";
 import { cart } from "../services/cart";
-
+import { PhotoProvider } from "react-photo-view";
+import 'react-photo-view/dist/react-photo-view.css';
 
 // import { createTheme, ThemeProvider } from '@mui/material/styles';
 // import { arEG } from '@mui/material/locale';
@@ -36,17 +37,20 @@ export default function Layout() {
     }, [])
     return (
         // <CacheProvider value={cacheRtl}>
-            ///* <ThemeProvider theme={theme}> */}
-                <div
-                    style={{
-                        "--p": dartColorToCss(store!.decoration!.primary),
-                        "--on-p": dartColorToCss(store!.decoration!.onPrimary!),
-                    } as React.CSSProperties}
-                >
-                    <Navbar store={store} fixed={false} />
-                    <Outlet />
-                    <Footer store={store} />
-                </div>
+        ///* <ThemeProvider theme={theme}> */}
+        <PhotoProvider>
+
+            <div
+                style={{
+                    "--p": dartColorToCss(store!.decoration!.primary),
+                    "--on-p": dartColorToCss(store!.decoration!.onPrimary!),
+                } as React.CSSProperties}
+            >
+                <Navbar store={store} fixed={false} />
+                <Outlet />
+                <Footer store={store} />
+            </div>
+        </PhotoProvider>
         //     </ThemeProvider>
         // </CacheProvider>
     );
