@@ -1,6 +1,6 @@
 import * as jsxRuntime from "react/jsx-runtime";
 import * as React from "react";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useId, useRef } from "react";
 import ReactDOMServer from "react-dom/server";
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from "react-router-dom/server.mjs";
 import { Link, useLoaderData, useLocation, Outlet, redirect } from "react-router-dom";
@@ -13,6 +13,7 @@ import { TypeAnimation } from "react-type-animation";
 import ReactPlayer from "react-player";
 import { SuperSEO } from "react-super-seo";
 import ReactGA from "react-ga4";
+import { PhotoView, PhotoProvider } from "react-photo-view";
 const Fragment = jsxRuntime.Fragment;
 const jsx = jsxRuntime.jsx;
 const jsxs = jsxRuntime.jsxs;
@@ -2038,7 +2039,67 @@ const cities = [
   ]
 ];
 function AsynxWave(params) {
-  return /* @__PURE__ */ jsx("div", {});
+  const id = useId();
+  const requestRef = useRef(null);
+  const tRef = useRef(0);
+  useEffect(() => {
+    const c = document.getElementById(id);
+    if (!c)
+      return;
+    const w = c.width;
+    const h = c.height;
+    const u = Math.min(w, h);
+    const ctx = c.getContext("2d");
+    const steps = 20;
+    const padding = params.padding !== void 0 ? params.padding : 0.2;
+    const f = (1 - padding) * u / 360;
+    const o = padding * u / 2;
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.beginPath();
+      ctx.lineWidth = 0.1 * u;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = params.color || getComputedStyle(c).getPropertyValue("--p");
+      ctx.globalAlpha = 0.3;
+      let y;
+      for (let x = 0; x <= 360 / steps; x++) {
+        y = 180 - Math.sin(0.75 * x * steps * Math.PI / 180 + tRef.current / 100) * 120;
+        ctx.lineTo(y * f + o, x * steps * f + o);
+      }
+      ctx.stroke();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.globalAlpha = 0.85;
+      for (let x = 0; x <= 360 / steps; x++) {
+        y = 180 - Math.cos(0.75 * x * steps * Math.PI / 180 + tRef.current / 100) * 120;
+        if (x === 0) {
+          ctx.moveTo(y * f + o, x * steps * f + o);
+        } else {
+          ctx.lineTo(y * f + o, x * steps * f + o);
+        }
+      }
+      ctx.stroke();
+      ctx.closePath();
+      tRef.current++;
+      requestRef.current = window.requestAnimationFrame(draw);
+    }
+    draw();
+    return () => {
+      if (requestRef.current) {
+        window.cancelAnimationFrame(requestRef.current);
+      }
+    };
+  }, [params.color, params.padding]);
+  return /* @__PURE__ */ jsx(
+    "canvas",
+    {
+      id,
+      width: "60",
+      height: "60",
+      style: { aspectRatio: 1 },
+      ...params
+    }
+  );
 }
 function Thanks({ order, onDone }) {
   return /* @__PURE__ */ jsxs(
@@ -2073,19 +2134,19 @@ function Thanks({ order, onDone }) {
           {
             "aria-label": "إغلاق",
             type: "button",
-            className: "w-full pulse btn gb",
+            className: "w-full btn gb",
             onClick: onDone,
             children: "إغلاق"
           }
         ),
         /* @__PURE__ */ jsx("div", { className: "h-2" }),
-        /* @__PURE__ */ jsx("div", { className: "p-2 bg-gray-100 text-center", children: /* @__PURE__ */ jsx(
+        /* @__PURE__ */ jsx("div", { className: "p-2 bg-gray-100 text-center w-full pulse btn gb", children: /* @__PURE__ */ jsx(
           "a",
           {
             "aria-label": "تتبع حالة الطلب",
             href: `https://feeef.app/track/${order.id}`,
             target: "_blank",
-            className: "text-blue-500",
+            className: "w-full text-blue-500",
             children: "تتبع حالة الطلب"
           }
         ) }),
@@ -2254,7 +2315,7 @@ function getCurrencySymbolByStore(store) {
   }
 }
 function ShippingForm({ store, shipping, shippingMethod, setShipping, sendOrder }) {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+  var _a, _b, _c, _d, _e, _f, _g;
   const [isPhoneValid, setIsPhoneValid] = useState(true);
   function updateShippingWilaya(stateCode) {
     const index = parseInt(stateCode) - 1;
@@ -2313,8 +2374,6 @@ function ShippingForm({ store, shipping, shippingMethod, setShipping, sendOrder 
     !!shipping.doorShipping
   );
   return /* @__PURE__ */ jsxs("div", { children: [
-    /* @__PURE__ */ jsx("h2", { className: "text-xl font-semibold flex", children: "معلومات التوصيل" }),
-    /* @__PURE__ */ jsx("div", { className: "h-2" }),
     /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-2 gap-x-4 gap-y-2", children: [
       /* @__PURE__ */ jsxs("div", { children: [
         /* @__PURE__ */ jsxs("span", { className: "text-sm font-light flex items-center", children: [
@@ -2350,8 +2409,7 @@ function ShippingForm({ store, shipping, shippingMethod, setShipping, sendOrder 
                   defaultValue: shipping.phone,
                   onChange: handlePhoneChange
                 }
-              ),
-              !isPhoneValid && /* @__PURE__ */ jsx("div", { className: "bg-red-500 rounded-b-lg text-white text-xs w-full text-center", children: validatePhoneNumber(tryFixPhoneNumber(shipping.phone)) })
+              )
             ]
           }
         )
@@ -2454,7 +2512,10 @@ function ShippingForm({ store, shipping, shippingMethod, setShipping, sendOrder 
         ] })
       ] })
     ] }),
-    (shipping.doorShipping && ((_d = (_c = store.metadata) == null ? void 0 : _c.shipping) == null ? void 0 : _d.mode) !== "deskOnly" || !canShipToDesk) && canShipToHome && /* @__PURE__ */ jsx(Fragment, { children: /* @__PURE__ */ jsxs("div", { children: [
+    // (shipping.doorShipping && store.metadata?.shipping?.mode !== "deskOnly"
+    //     || !canShipToDesk
+    // ) && canShipToHome &&
+    /* @__PURE__ */ jsx(Fragment, { children: /* @__PURE__ */ jsxs("div", { children: [
       /* @__PURE__ */ jsx("span", { className: "text-sm font-light", children: "العنوان" }),
       /* @__PURE__ */ jsxs("div", { className: "relative overflow-hidden border border-gray-500 border-opacity-20 rounded-lg", children: [
         /* @__PURE__ */ jsx(IconLocationBolt, { className: "absolute top-2 right-2 text-gray-400" }),
@@ -2474,24 +2535,26 @@ function ShippingForm({ store, shipping, shippingMethod, setShipping, sendOrder 
       ] })
     ] }) }),
     /* @__PURE__ */ jsx("div", { className: "h-4" }),
-    ((_f = (_e = store.metadata) == null ? void 0 : _e.shipping) == null ? void 0 : _f.mode) === "deskOnly" || ((_h = (_g = store.metadata) == null ? void 0 : _g.shipping) == null ? void 0 : _h.mode) === "homeOnly" || !canShipToDesk || !canShipToHome ? null : /* @__PURE__ */ jsxs("span", { className: "relative inline-flex items-center cursor-pointer", children: [
-      /* @__PURE__ */ jsx("input", { type: "checkbox", onChange: () => {
-        shipping.doorShipping = !shipping.doorShipping && canShipToHome;
-        setShipping({ ...shipping });
-      }, checked: shipping.doorShipping, className: "sr-only peer" }),
+    ((_d = (_c = store.metadata) == null ? void 0 : _c.shipping) == null ? void 0 : _d.mode) === "deskOnly" || ((_f = (_e = store.metadata) == null ? void 0 : _e.shipping) == null ? void 0 : _f.mode) === "homeOnly" || !canShipToDesk || !canShipToHome ? null : /* @__PURE__ */ jsxs("span", { className: "relative inline-flex items-center cursor-pointer", onClick: () => {
+      shipping.doorShipping = !shipping.doorShipping;
+      setShipping({ ...shipping });
+    }, children: [
+      /* @__PURE__ */ jsx("input", { type: "checkbox", checked: shipping.doorShipping, className: "sr-only peer" }),
       /* @__PURE__ */ jsx("div", { className: "pulse w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-primary rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:m-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary" }),
       /* @__PURE__ */ jsx("div", { className: "ms-3 flex flex-col", children: /* @__PURE__ */ jsxs("span", { className: "text-sm font-medium text-gray-900 dark:text-gray-300", children: [
-        !shipping.doorShipping && "هل تريد ",
-        "التوصيل للبيت ",
-        !shipping.doorShipping && /* @__PURE__ */ jsxs("b", { dir: "ltr", children: [
-          "مقابل ",
-          getCurrencySymbolByStore(store),
-          (_i = getShippingRateForState({
-            shippingMethod,
-            store,
-            state: shipping.address.state
-          })) == null ? void 0 : _i.home
-        ] })
+        !shipping.doorShipping && /* @__PURE__ */ jsxs(Fragment, { children: [
+          "هل تريد التوصيل للبيت ",
+          /* @__PURE__ */ jsxs("b", { dir: "ltr", children: [
+            "مقابل ",
+            getCurrencySymbolByStore(store),
+            (_g = getShippingRateForState({
+              shippingMethod,
+              store,
+              state: shipping.address.state
+            })) == null ? void 0 : _g.home
+          ] })
+        ] }),
+        shipping.doorShipping && "توصيل للبيت مفعل"
       ] }) })
     ] })
   ] });
@@ -2557,6 +2620,7 @@ function Product({ store, product }) {
   const [orderId] = useState(generateOrderId());
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [mountPlayer, setMountPlayer] = useState(false);
+  const [error, setError] = useState(null);
   useEffect(() => {
     if (product == null ? void 0 : product.media.length) {
       var media = product.media[selectedMediaIndex];
@@ -2588,7 +2652,8 @@ function Product({ store, product }) {
       },
       state: "16",
       zip: ""
-    }
+    },
+    shippingType: "home"
   });
   function clearOrder() {
     setSentOrder(null);
@@ -2659,18 +2724,22 @@ function Product({ store, product }) {
     }
     return (rate == null ? void 0 : rate.desk) === void 0 ? null : rate == null ? void 0 : rate.desk;
   }
-  function scrollToShippingForm() {
+  function scrollToShippingForm(withError = false) {
     var el = document.getElementById("order-form");
     el == null ? void 0 : el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-    el == null ? void 0 : el.classList.add("pulse");
+    el == null ? void 0 : el.classList.add(
+      withError ? " shake " : "pulse"
+    );
     setTimeout(() => {
-      el == null ? void 0 : el.classList.remove("pulse");
+      el == null ? void 0 : el.classList.remove(withError ? " shake " : "pulse");
     }, 3e3);
   }
   async function sendOrder(status = "pending") {
     var _a2;
+    setError(null);
     var validationError = validatePhoneNumber(tryFixPhoneNumber(shipping.phone));
     if (validationError) {
+      setError(validationError);
       return;
     }
     shipping.phone = tryFixPhoneNumber(shipping.phone);
@@ -2700,6 +2769,7 @@ function Product({ store, product }) {
       shippingAddress: shipping.address.street,
       shippingCity: shipping.address.city,
       shippingState: shipping.address.state,
+      shippingType: shipping.shippingType,
       status,
       storeId: store.id,
       items: cart.hasProduct(product.id) ? cart.items : [
@@ -2779,46 +2849,32 @@ function Product({ store, product }) {
         onClick: (e) => {
           e.preventDefault();
           sendOrder("pending");
+          scrollToShippingForm();
         },
         type: "submit",
         className: "h-12 relative w-full text-white bg-primary focus:ring-2 focus:outline-none focus:ring-primary ring-opacity-30 font-medium rounded-lg text-sm px-4 py-2 text-center   ",
         children: [
-          /* @__PURE__ */ jsx(
-            AsynxWave,
+          /* @__PURE__ */ jsx("img", { src: "https://s3.feeef.app/feeef/assets/click_animation.gif", className: "absolute start-0 top-0 bottom-0 h-full aspect-square", style: { filter: "invert()", mixBlendMode: "color-dodge" } }),
+          /* @__PURE__ */ jsx("div", { className: "flex items-center justify-center text-xl", children: /* @__PURE__ */ jsx(
+            TypeAnimation,
             {
-              color: "white",
-              width: "100%",
-              height: "100%",
-              className: "absolute start-0 top-0 bottom-0 h-full aspect-square",
-              padding: 0
+              cursor: true,
+              sequence: [
+                "...اشتري الآن",
+                2500,
+                "سنتصل بك لتأكيد الطلبية",
+                500,
+                "ماذا تنتظر؟",
+                500,
+                "إظغط هنا لإرسال الطلب",
+                500,
+                "إظغط هنا لإرسال الطلب...",
+                500
+              ],
+              repeat: Infinity,
+              speed: 80
             }
-          ),
-          /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center", children: [
-            /* @__PURE__ */ jsx(
-              TypeAnimation,
-              {
-                cursor: true,
-                sequence: [
-                  "شراء الآن",
-                  2500,
-                  "سنتصل بك لتأكيد الطلبية",
-                  500,
-                  "ماذا تنتظر؟",
-                  500,
-                  "إظغط هنا لإرسال الطلب",
-                  500,
-                  "إظغط هنا لإرسال الطلب...",
-                  500
-                ],
-                repeat: Infinity,
-                speed: 50
-              }
-            ),
-            /* @__PURE__ */ jsxs("span", { dir: "ltr", className: "mx-2 text-primary rounded-full px-2", style: { backgroundColor: "var(--on-p)" }, children: [
-              "x",
-              item.quantity
-            ] })
-          ] }),
+          ) }),
           /* @__PURE__ */ jsx(IconShoppingBag, { size: 34, className: "absolute end-3 top-0 bottom-0 m-auto" })
         ]
       }
@@ -2870,7 +2926,7 @@ function Product({ store, product }) {
                       padding: 0
                     }
                   ),
-                  /* @__PURE__ */ jsx("div", { className: "flex items-center justify-center", children: /* @__PURE__ */ jsx(
+                  /* @__PURE__ */ jsx("div", { className: "flex items-center justify-center text-xl", children: /* @__PURE__ */ jsx(
                     TypeAnimation,
                     {
                       cursor: true,
@@ -2990,7 +3046,7 @@ function Product({ store, product }) {
                   }
                 ) || /* @__PURE__ */ jsx("img", { src: `https://img.youtube.com/vi/${getYoutubeVideoIdFromUrl(media)}/maxresdefault.jpg`, className: "object-cover w-full h-full" })
               }
-            ) : /* @__PURE__ */ jsx(
+            ) : /* @__PURE__ */ jsx(PhotoView, { src: media, children: /* @__PURE__ */ jsx(
               "img",
               {
                 src: media,
@@ -3008,7 +3064,7 @@ function Product({ store, product }) {
                   opacity: selectedMediaIndex == index ? 1 : 0
                 }
               }
-            ) }, index))
+            ) }, index) }, index))
           }
         ) }),
         /* @__PURE__ */ jsx("div", { className: "flex-wrap bottom-0 w-full flex justify-center p-2 items-end pointer-events-none", children: product == null ? void 0 : product.media.map((media, index) => /* @__PURE__ */ jsx(
@@ -3106,6 +3162,9 @@ function Product({ store, product }) {
           /* @__PURE__ */ jsx("div", { className: "h-4" }),
           /* @__PURE__ */ jsxs("div", { id: "order-form", className: "gb rounded-xl", children: [
             /* @__PURE__ */ jsxs("div", { className: "p-4", children: [
+              /* @__PURE__ */ jsx("h2", { className: "text-xl font-semibold flex", children: "معلومات التوصيل" }),
+              error && /* @__PURE__ */ jsx("div", { className: "text-red-500 text-sm p-2 bg-red-100 rounded-lg text-center", children: error }),
+              /* @__PURE__ */ jsx("div", { className: "h-2" }),
               /* @__PURE__ */ jsx(
                 ShippingForm,
                 {
@@ -3120,9 +3179,7 @@ function Product({ store, product }) {
               /* @__PURE__ */ jsx("div", { ref: sendOrderButtonRef, className: "pulse rounded-lg flex flex-col md:flex-row justify-between items-center", children: /* @__PURE__ */ jsx(SendOrderButton, { id: "fixed" }) }),
               /* @__PURE__ */ jsx("div", { className: "h-2" }),
               /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center", children: [
-                /* @__PURE__ */ jsx("div", { className: "text-gray-600", children: "الكمية" }),
-                /* @__PURE__ */ jsx("div", { className: "flex-grow" }),
-                /* @__PURE__ */ jsxs("div", { className: "flex items-center bg-gray-200 text-gray-700 justify-center border-2 rounded-lg overflow-hidden", children: [
+                /* @__PURE__ */ jsxs("div", { className: "w-[50%] flex items-center bg-gray-200 text-gray-700 justify-center border-2 rounded-lg overflow-hidden", children: [
                   /* @__PURE__ */ jsx(
                     "button",
                     {
@@ -3134,7 +3191,7 @@ function Product({ store, product }) {
                           quantity: prevItem.quantity > 1 ? prevItem.quantity - 1 : 1
                         }));
                       },
-                      className: "px-3 py-1 bg-gray-200 text-gray-700 rounded-s-lg",
+                      className: "w-full px-3 py-1 bg-gray-200 text-gray-700 rounded-s-lg",
                       children: "-"
                     }
                   ),
@@ -3150,13 +3207,13 @@ function Product({ store, product }) {
                           quantity: prevItem.quantity + 1
                         }));
                       },
-                      className: "px-3 py-1 ",
+                      className: "w-full px-3 py-1 ",
                       children: "+"
                     }
                   )
                 ] }),
                 /* @__PURE__ */ jsx("div", { className: "w-2" }),
-                !cart.canAddProduct(product) ? null : !cart.hasProduct(product.id) ? /* @__PURE__ */ jsx(
+                /* @__PURE__ */ jsx("div", { className: "w-[50%]", children: !cart.canAddProduct(product) ? null : !cart.hasProduct(product.id) ? /* @__PURE__ */ jsx(
                   "button",
                   {
                     "aria-label": "إضافة الى السلة",
@@ -3169,7 +3226,7 @@ function Product({ store, product }) {
                       });
                       setItem({ ...item });
                     },
-                    className: "px-3 py-1 rounded-lg border-2 border-primary text-primary",
+                    className: "w-full px-3 py-1 rounded-lg border-2 border-primary text-primary",
                     children: "إضافة إلى السلة"
                   }
                 ) : /* @__PURE__ */ jsx(
@@ -3180,10 +3237,10 @@ function Product({ store, product }) {
                       cart.removeProduct(product.id);
                       setItem({ ...item });
                     },
-                    className: "px-3 py-1 rounded-lg border-2 border-red-500 text-red-500",
+                    className: "w-full px-3 py-1 rounded-lg border-2 border-red-500 text-red-500",
                     children: "إزالة من السلة"
                   }
-                )
+                ) })
               ] })
             ] }),
             /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center", children: [
@@ -3462,6 +3519,7 @@ const cart = {
     return rate;
   }
 };
+const reactPhotoView = "";
 function Layout() {
   let store = useLoaderData();
   useEffect(() => {
@@ -3470,7 +3528,7 @@ function Layout() {
   return (
     // <CacheProvider value={cacheRtl}>
     ///* <ThemeProvider theme={theme}> */}
-    /* @__PURE__ */ jsxs(
+    /* @__PURE__ */ jsx(PhotoProvider, { children: /* @__PURE__ */ jsxs(
       "div",
       {
         style: {
@@ -3483,7 +3541,7 @@ function Layout() {
           /* @__PURE__ */ jsx(Footer, { store })
         ]
       }
-    )
+    ) })
   );
 }
 const CategoryButton = ({
@@ -3570,7 +3628,7 @@ const routes = [
       },
       {
         path: "lazy",
-        lazy: () => import("./assets/lazy-bf67a32c.mjs")
+        lazy: () => import("./assets/lazy-4855271e.mjs")
       },
       {
         path: "redirect",

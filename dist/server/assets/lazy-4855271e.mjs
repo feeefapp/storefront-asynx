@@ -13,6 +13,7 @@ import "react-type-animation";
 import "react-player";
 import "react-super-seo";
 import "react-ga4";
+import "react-photo-view";
 const loader = async () => {
   await new Promise((r) => setTimeout(r, 5e3));
   return {
