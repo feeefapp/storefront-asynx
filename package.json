@@ -10,6 +10,7 @@
     "debug": "node --inspect-brk server.js"
   },
   "dependencies": {
+    "@million/lint": "^1.0.0-rc.84",
     "@poppinss/utils": "^6.7.3",
     "@react-input/mask": "^1.0.20",
     "@remix-run/node": "^1.12.0",

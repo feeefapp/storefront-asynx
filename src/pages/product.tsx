@@ -1,5 +1,5 @@
 import { useLoaderData, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, memo } from "react";
 import StickyBox from "react-sticky-box";
 import { cities } from "../cities";
 import AsynxWave from "../widgets/asynx_wave";
@@ -424,6 +424,10 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
 
 
 
+    const memoizedMarkdown = useMemo(() => (
+        <Markdown className="py-4 prose dark:prose-invert">{product?.body}</Markdown>
+    ), [product?.body]);
+
     return (
         <div className="relative">
             {/* show fixed in the button SendOrderButton(id=dynamic), it shown only when SendOrderButton(id=fixed) not in view */}
@@ -590,8 +594,7 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                                         || <img src={`https://img.youtube.com/vi/${getYoutubeVideoIdFromUrl(media)}/maxresdefault.jpg`} className="object-cover w-full h-full" />
                                                     }
                                                 </div> :
-                                                <PhotoView key={index} src={media}>
-
+                                                <MemoizedPhotoView key={index} src={media}>
                                                     <img
                                                         src={media} className={
                                                             "inset-0 object-contain aspect-square"
@@ -610,7 +613,7 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                                             opacity: selectedMediaIndex == index ? 1 : 0,
                                                         }}
                                                     />
-                                                </PhotoView>
+                                                </MemoizedPhotoView>
                                             }
                                         </div>
                                     ))
@@ -938,7 +941,7 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                 </div>
 
                             </div>
-                            <Markdown className="p-4 prose dark:prose-invert" >{product?.body}</Markdown>
+                            {memoizedMarkdown}
                         </div>
                     </div>
                 </div>
@@ -972,4 +975,17 @@ export function getYoutubeVideoIdFromUrl(url: string): string | null {
 }
 
 
+
+// MemoizedPhotoView
+function MemoizedPhotoView({ src, children }: { src: string, children: React.ReactNode }) {
+    return <PhotoView
+            src={src}
+            >
+            {children as React.ReactElement}
+        </PhotoView>
+}
+
+
+
 export default ProductPage;
+

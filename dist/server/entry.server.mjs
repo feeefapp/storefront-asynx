@@ -1,6 +1,6 @@
 import * as jsxRuntime from "react/jsx-runtime";
 import * as React from "react";
-import { useState, useCallback, useEffect, useId, useRef } from "react";
+import { useState, useCallback, useEffect, useId, useRef, useMemo } from "react";
 import ReactDOMServer from "react-dom/server";
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from "react-router-dom/server.mjs";
 import { Link, useLoaderData, useLocation, Outlet, redirect } from "react-router-dom";
@@ -2884,6 +2884,7 @@ function Product({ store, product }) {
     document.title = (product == null ? void 0 : product.name) || store.title || "";
     updateShippingWilaya(shipping.address.state);
   }, []);
+  const memoizedMarkdown = useMemo(() => /* @__PURE__ */ jsx(Markdown, { className: "py-4 prose dark:prose-invert", children: product == null ? void 0 : product.body }), [product == null ? void 0 : product.body]);
   return /* @__PURE__ */ jsxs("div", { className: "relative", children: [
     /* @__PURE__ */ jsx(
       "div",
@@ -3046,7 +3047,7 @@ function Product({ store, product }) {
                   }
                 ) || /* @__PURE__ */ jsx("img", { src: `https://img.youtube.com/vi/${getYoutubeVideoIdFromUrl(media)}/maxresdefault.jpg`, className: "object-cover w-full h-full" })
               }
-            ) : /* @__PURE__ */ jsx(PhotoView, { src: media, children: /* @__PURE__ */ jsx(
+            ) : /* @__PURE__ */ jsx(MemoizedPhotoView, { src: media, children: /* @__PURE__ */ jsx(
               "img",
               {
                 src: media,
@@ -3304,7 +3305,7 @@ function Product({ store, product }) {
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ jsx(Markdown, { className: "p-4 prose dark:prose-invert", children: product == null ? void 0 : product.body })
+          memoizedMarkdown
         ] })
       ] })
     ] }) })
@@ -3328,6 +3329,15 @@ function getYoutubeVideoIdFromUrl(url) {
     }
   }
   return null;
+}
+function MemoizedPhotoView({ src, children }) {
+  return /* @__PURE__ */ jsx(
+    PhotoView,
+    {
+      src,
+      children
+    }
+  );
 }
 function getShippingRateForState({ shippingMethod, store, state }) {
   var _a, _b;
