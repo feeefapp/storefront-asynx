@@ -307,7 +307,7 @@ function Footer({ store }) {
           "a",
           {
             "aria-label": "feeef",
-            href: "https://feeef.app/?ref=footer_copyrights",
+            href: "https://feeef.net/?ref=footer_copyrights",
             target: "_blank",
             className: "text-primary",
             children: "feeef.app"

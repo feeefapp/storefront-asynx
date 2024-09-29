@@ -174,7 +174,7 @@ function Footer({ store }: { store: StoreEntity }) {
             <span className="text-sm font-extralight">
               أنشأ متجرك الإلكتروني مجانا على <a 
                 aria-label="feeef"
-              href="https://feeef.app/?ref=footer_copyrights" target="_blank" className="text-primary">feeef.app</a> | جميع الحقوق  محفوظة
+              href="https://feeef.net/?ref=footer_copyrights" target="_blank" className="text-primary">feeef.app</a> | جميع الحقوق  محفوظة
             </span>
 
           </p>
