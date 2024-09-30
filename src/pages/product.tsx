@@ -392,9 +392,9 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                     500,
                     "ماذا تنتظر؟",
                     500,
-                    "إظغط هنا لإرسال الطلب",
+                    "إضغط هنا لإرسال الطلب",
                     500,
-                    "إظغط هنا لإرسال الطلب...",
+                    "إضغط هنا لإرسال الطلب...",
                     500,
                 ]}
                     repeat={Infinity}
@@ -478,9 +478,9 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                                     500,
                                     "ماذا تنتظر؟",
                                     500,
-                                    "إظغط هنا لإرسال الطلب",
+                                    "إضغط هنا لإرسال الطلب",
                                     500,
-                                    "إظغط هنا لإرسال الطلب...",
+                                    "إضغط هنا لإرسال الطلب...",
                                     500,
                                 ]}
                                     repeat={Infinity}
