@@ -33,7 +33,7 @@ export default function Thanks({ order, onDone }: {
                 aria-label="إغلاق"
             type="button" className="w-full btn gb" onClick={onDone}>إغلاق</button>
             <div className="h-2"></div>
-            <div className="p-2 bg-gray-100 text-center w-full pulse btn gb">
+            <div className="p-2 bg-gray-100 text-center w-full btn gb">
                 <a 
                     aria-label="تتبع حالة الطلب"
                 href={`https://feeef.app/track/${order.id}`} target="_blank" className="w-full text-blue-500">تتبع حالة الطلب</a>
