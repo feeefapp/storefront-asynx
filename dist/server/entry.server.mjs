@@ -2151,13 +2151,17 @@ function Thanks({ order, onDone }) {
           }
         ) }),
         /* @__PURE__ */ jsx("div", { className: "h-2" }),
-        /* @__PURE__ */ jsx(Link, { to: "/", children: /* @__PURE__ */ jsx(
-          "button",
+        /* @__PURE__ */ jsx("div", { className: "p-2 bg-gray-100 text-center w-full pulse btn gb", children: /* @__PURE__ */ jsxs(
+          "a",
           {
-            "aria-label": "باقي المنتجات",
-            type: "button",
-            className: "w-full btn gb",
-            children: "باقي المنتجات"
+            "aria-label": "استطلاع الرضا",
+            href: "https://forms.gle/ayjrFv1Do92ZoqnR6",
+            target: "_blank",
+            className: "w-full text-green-500",
+            children: [
+              /* @__PURE__ */ jsx("div", { children: "شاركنا رأيك 😍" }),
+              /* @__PURE__ */ jsx("div", { className: "text-xs", children: "هدايا عند اكمال التقييم" })
+            ]
           }
         ) })
       ]
