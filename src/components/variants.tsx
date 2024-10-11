@@ -99,10 +99,10 @@ function RenderVariantGroup({ variantGroup, path, onPathChange, onSelect }: {
     return (
         <div>
             <div className="h-1"></div>
-            <h3 className="text-sm font-medium">{variantGroup.name}
+            <h3 className="text-lg font-medium">{variantGroup.name}
                 {
                     getVariant(selected!) &&
-                    <span dir="ltr" className="px-2 bg-primary text-white rounded-full">
+                    <span dir="ltr" className="px-2 me-2 bg-primary text-white rounded-full">
                         <span className="px-1">{getVariant(selected!)?.name}</span>
                     </span>
                 }{

@@ -2205,9 +2205,9 @@ function RenderVariantGroup({ variantGroup, path, onPathChange, onSelect }) {
   }
   return /* @__PURE__ */ jsxs("div", { children: [
     /* @__PURE__ */ jsx("div", { className: "h-1" }),
-    /* @__PURE__ */ jsxs("h3", { className: "text-sm font-medium", children: [
+    /* @__PURE__ */ jsxs("h3", { className: "text-lg font-medium", children: [
       variantGroup.name,
-      getVariant(selected) && /* @__PURE__ */ jsx("span", { dir: "ltr", className: "px-2 bg-primary text-white rounded-full", children: /* @__PURE__ */ jsx("span", { className: "px-1", children: (_a = getVariant(selected)) == null ? void 0 : _a.name }) }),
+      getVariant(selected) && /* @__PURE__ */ jsx("span", { dir: "ltr", className: "px-2 me-2 bg-primary text-white rounded-full", children: /* @__PURE__ */ jsx("span", { className: "px-1", children: (_a = getVariant(selected)) == null ? void 0 : _a.name }) }),
       ((_b = getVariant(selected)) == null ? void 0 : _b.stock) !== void 0 && /* @__PURE__ */ jsxs("span", { className: "  text-primary rounded-full px-2", children: [
         (_c = getVariant(selected)) == null ? void 0 : _c.stock,
         " متوفر"
@@ -3126,40 +3126,36 @@ function Product({ store, product }) {
           ] })
         ] }),
         /* @__PURE__ */ jsxs("div", { className: "product-color", children: [
-          (product == null ? void 0 : product.variant) && /* @__PURE__ */ jsxs("div", { className: "gb p-4 rounded-xl", children: [
-            /* @__PURE__ */ jsx("h2", { className: "text-xl font-semibold", children: "الخيارات المتوفرة" }),
-            /* @__PURE__ */ jsx("div", { className: "h-2" }),
-            /* @__PURE__ */ jsx(
-              RenderVariantGroup,
-              {
-                variantGroup: product.variant,
-                path: item.variants,
-                onPathChange: (path) => {
-                  if (item.variants.join() == path.join()) {
-                    path.pop();
-                  }
-                  item.variants = path;
-                  cart.updateVariantPath(product.id, path.join("/"));
-                  return setItem({ ...item });
-                },
-                onSelect: (variant) => {
-                  if ((variant == null ? void 0 : variant.type) == VariantOptionType.image) {
-                    var mediaIndex = product == null ? void 0 : product.media.findIndex((media) => media == variant.value);
-                    var el = document.getElementById(`slide-${mediaIndex + 1}`);
-                    el == null ? void 0 : el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-                  }
-                  track("ViewContent", {
-                    content_name: (product == null ? void 0 : product.name) + " " + (variant == null ? void 0 : variant.name),
-                    // content_category: 'cloth',
-                    content_ids: [product == null ? void 0 : product.id],
-                    content_type: "product",
-                    value: getTotal() ?? 0,
-                    currency: "DZD"
-                  });
+          (product == null ? void 0 : product.variant) && /* @__PURE__ */ jsx("div", { className: "gb p-4 rounded-xl", children: /* @__PURE__ */ jsx(
+            RenderVariantGroup,
+            {
+              variantGroup: product.variant,
+              path: item.variants,
+              onPathChange: (path) => {
+                if (item.variants.join() == path.join()) {
+                  path.pop();
                 }
+                item.variants = path;
+                cart.updateVariantPath(product.id, path.join("/"));
+                return setItem({ ...item });
+              },
+              onSelect: (variant) => {
+                if ((variant == null ? void 0 : variant.type) == VariantOptionType.image) {
+                  var mediaIndex = product == null ? void 0 : product.media.findIndex((media) => media == variant.value);
+                  var el = document.getElementById(`slide-${mediaIndex + 1}`);
+                  el == null ? void 0 : el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+                }
+                track("ViewContent", {
+                  content_name: (product == null ? void 0 : product.name) + " " + (variant == null ? void 0 : variant.name),
+                  // content_category: 'cloth',
+                  content_ids: [product == null ? void 0 : product.id],
+                  content_type: "product",
+                  value: getTotal() ?? 0,
+                  currency: "DZD"
+                });
               }
-            )
-          ] }),
+            }
+          ) }),
           /* @__PURE__ */ jsx("div", { className: "h-4" }),
           /* @__PURE__ */ jsxs("div", { id: "order-form", className: "gb rounded-xl", children: [
             /* @__PURE__ */ jsxs("div", { className: "p-4", children: [

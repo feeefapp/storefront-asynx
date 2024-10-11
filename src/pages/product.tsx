@@ -429,6 +429,7 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
     ), [product?.body]);
 
     return (
+        
         <div className="relative">
             {/* show fixed in the button SendOrderButton(id=dynamic), it shown only when SendOrderButton(id=fixed) not in view */}
             {
@@ -686,10 +687,10 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
                         </div>
                         <div className="product-color">
                             {
-                                product?.variant &&
+                                product?.variant  &&
                                 <div className="gb p-4 rounded-xl">
-                                    <h2 className="text-xl font-semibold">الخيارات المتوفرة</h2>
-                                    <div className="h-2"></div>
+                                    {/* <h2 className="text-xl font-semibold">الخيارات المتوفرة</h2> */}
+                                    {/* <div className="h-2"></div> */}
                                     {/* variant groups */}
                                     <RenderVariantGroup
                                         variantGroup={product!.variant!}
