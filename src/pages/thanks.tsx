@@ -11,9 +11,7 @@ export default function Thanks({ order, onDone }: {
         <div
             className=""
         >
-            <center>
-                رقم الطلب #{order.id}
-            </center>
+            <center>رقم الطلب #{order.id}</center>
             <div className="h-5"></div>
             <div className="relative">
                 <h2 className="text-7xl flex">
@@ -36,14 +34,12 @@ export default function Thanks({ order, onDone }: {
             <div className="p-2 bg-gray-100 text-center w-full btn gb">
                 <a 
                     aria-label="تتبع حالة الطلب"
-                href={`https://feeef.app/track/${order.id}`} target="_blank" className="w-full text-blue-500">تتبع حالة الطلب</a>
+                href={`https://feeef.app/track/${order.id}`} target="_blank" className="w-full text-blue-500">تتبع حالة الطلب مباشرة</a>
             </div>
             <div className="h-2"></div>
             {/* https://forms.gle/ayjrFv1Do92ZoqnR6 survay */}
             <div className="p-2 bg-gray-100 text-center w-full pulse btn gb">
-                <a 
-                    aria-label="استطلاع الرضا"
-                href="https://forms.gle/ayjrFv1Do92ZoqnR6" target="_blank" className="w-full text-green-500">
+                <a aria-label="استطلاع الرضا" href="https://forms.gle/ayjrFv1Do92ZoqnR6" target="_blank" className="w-full text-green-500">
                     <div>شاركنا رأيك 😍</div>
                     {/* small text "هدايا عند اكمال التقييم" */}
                     <div className="text-xs">هدايا عند اكمال التقييم</div>

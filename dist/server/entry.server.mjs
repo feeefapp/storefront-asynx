@@ -2140,30 +2140,21 @@ function Thanks({ order, onDone }) {
           }
         ),
         /* @__PURE__ */ jsx("div", { className: "h-2" }),
-        /* @__PURE__ */ jsx("div", { className: "p-2 bg-gray-100 text-center w-full pulse btn gb", children: /* @__PURE__ */ jsx(
+        /* @__PURE__ */ jsx("div", { className: "p-2 bg-gray-100 text-center w-full btn gb", children: /* @__PURE__ */ jsx(
           "a",
           {
             "aria-label": "تتبع حالة الطلب",
             href: `https://feeef.app/track/${order.id}`,
             target: "_blank",
             className: "w-full text-blue-500",
-            children: "تتبع حالة الطلب"
+            children: "تتبع حالة الطلب مباشرة"
           }
         ) }),
         /* @__PURE__ */ jsx("div", { className: "h-2" }),
-        /* @__PURE__ */ jsx("div", { className: "p-2 bg-gray-100 text-center w-full pulse btn gb", children: /* @__PURE__ */ jsxs(
-          "a",
-          {
-            "aria-label": "استطلاع الرضا",
-            href: "https://forms.gle/ayjrFv1Do92ZoqnR6",
-            target: "_blank",
-            className: "w-full text-green-500",
-            children: [
-              /* @__PURE__ */ jsx("div", { children: "شاركنا رأيك 😍" }),
-              /* @__PURE__ */ jsx("div", { className: "text-xs", children: "هدايا عند اكمال التقييم" })
-            ]
-          }
-        ) })
+        /* @__PURE__ */ jsx("div", { className: "p-2 bg-gray-100 text-center w-full pulse btn gb", children: /* @__PURE__ */ jsxs("a", { "aria-label": "استطلاع الرضا", href: "https://forms.gle/ayjrFv1Do92ZoqnR6", target: "_blank", className: "w-full text-green-500", children: [
+          /* @__PURE__ */ jsx("div", { children: "شاركنا رأيك 😍" }),
+          /* @__PURE__ */ jsx("div", { className: "text-xs", children: "هدايا عند اكمال التقييم" })
+        ] }) })
       ]
     }
   );
@@ -3604,6 +3595,7 @@ async function getProducts(storeId) {
   if (_storeProducts[storeId] && false)
     return _storeProducts[storeId];
   var products = await ff.products.list({
+    limit: 100,
     params: {
       store_id: storeId
     }
