@@ -5,7 +5,7 @@ import "react";
 import "react-dom/server";
 import "react-router-dom/server.mjs";
 import "@tabler/icons-react";
-import "feeef";
+import "axios";
 import "react-sticky-box";
 import "nanoid";
 import "react-markdown";

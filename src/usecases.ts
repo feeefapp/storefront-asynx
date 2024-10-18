@@ -36,7 +36,7 @@ export async function getProduct(slug: string): Promise<ProductEntity> {
 export async function getProducts(storeId: string): Promise<ProductEntity[]> {
     if (_storeProducts[storeId] && !import.meta.env.SSR) return _storeProducts[storeId];
     var products = await ff.products.list({
-        limit: 100,
+        limit: 200,
         params: {
             store_id: storeId,
         },

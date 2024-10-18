@@ -109,12 +109,19 @@ function Home() {
   const [selectedCategory, setSelectedCategory] =
     useState<EmbaddedCategory | null>(null);
 
+  // search query
+  const [searchQuery, setSearchQuery] = useState<string | null>(null);
+
   function filteredProducts() {
-    return products.filter((product) =>
-      !selectedCategory
+    return products.filter((product) => {
+      const matchesCategory = !selectedCategory
         ? true
-        : product.category?.name == selectedCategory?.name
-    );
+        : product.category?.name == selectedCategory?.name;
+      const matchesSearchQuery = !searchQuery
+        ? true
+        : product!.name!.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearchQuery;
+    });
   }
 
   return (
@@ -184,7 +191,7 @@ gtag('config', 'G-PHHZC0B2SR');`,
             >
               {store?.name}
             </h4>
-            <AsynxWave></AsynxWave>
+            {/* <AsynxWave></AsynxWave> */}
           </div>
           <h1 className="title-font font-light mt-1 text-4xl text-gray-900 dark:text-white sm:text-5xl sm:tracking-tight lg:text-4xl">
             {store?.title}
@@ -199,6 +206,15 @@ gtag('config', 'G-PHHZC0B2SR');`,
           >
             {store?.description}
           </p>
+        </div>
+        <div className="mt-8">
+          <input
+            type="text"
+            placeholder="ابحث عن منتج"
+            value={searchQuery || ""}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-[300px] p-2 border border-gray-300 rounded-md"
+          />
         </div>
       </div>
       <div className="h-4"></div>

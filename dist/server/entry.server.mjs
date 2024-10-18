@@ -1,3 +1,9 @@
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
 import * as jsxRuntime from "react/jsx-runtime";
 import * as React from "react";
 import { useState, useCallback, useEffect, useId, useRef, useMemo } from "react";
@@ -5,7 +11,7 @@ import ReactDOMServer from "react-dom/server";
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from "react-router-dom/server.mjs";
 import { Link, useLoaderData, useLocation, Outlet, redirect } from "react-router-dom";
 import { IconBrightness, IconBrandFacebook, IconBrandInstagram, IconLink, IconBrandTwitter, IconBrandTelegram, IconMail, IconPhoneCall, IconPhone, IconUser, IconLocation, IconLocationCode, IconLocationBolt, IconShoppingBag, IconFlag } from "@tabler/icons-react";
-import { EmbaddedContactType, FeeeF, VariantOptionType } from "feeef";
+import axios from "axios";
 import StickyBox from "react-sticky-box";
 import { customAlphabet } from "nanoid";
 import Markdown from "react-markdown";
@@ -168,6 +174,617 @@ function Navbar({ store, fixed = true }) {
     ] }) }) })
   ] });
 }
+var ModelRepository = class {
+  /**
+   * Constructs a new instance of the ModelRepository class.
+   * @param resource - The resource name.
+   * @param client - The Axios instance used for making HTTP requests.
+   */
+  constructor(resource, client) {
+    __publicField(this, "resource");
+    // client
+    __publicField(this, "client");
+    this.resource = resource;
+    this.client = client;
+  }
+  /**
+   * Finds a model by its ID or other criteria.
+   * @param options - The options for finding the model.
+   * @returns A promise that resolves to the found model.
+   */
+  async find(options) {
+    const { id, by, params } = options;
+    const res = await this.client.get(`/${this.resource}/${id}`, {
+      params: {
+        by: by || "id",
+        ...params
+      }
+    });
+    return res.data;
+  }
+  /**
+   * Lists models with optional pagination and filtering.
+   * @param options - The options for listing the models.
+   * @returns A promise that resolves to a list of models.
+   */
+  async list(options) {
+    const { page, offset, limit, params } = options || {};
+    const res = await this.client.get(`/${this.resource}`, {
+      params: { page, offset, limit, ...params }
+    });
+    if (Array.isArray(res.data)) {
+      return {
+        data: res.data
+      };
+    } else {
+      return {
+        data: res.data.data,
+        total: res.data.meta.total,
+        page: res.data.meta.currentPage,
+        limit: res.data.meta.perPage
+      };
+    }
+  }
+  /**
+   * Creates a new model.
+   * @param options - The options for creating the model.
+   * @returns A promise that resolves to the created model.
+   */
+  async create(options) {
+    const { data, params } = options;
+    const res = await this.client.post(`/${this.resource}`, data, { params });
+    return res.data;
+  }
+  /**
+   * Updates an existing model.
+   * @param options - The options for updating the model.
+   * @returns A promise that resolves to the updated model.
+   */
+  async update(options) {
+    const { id, data, params } = options;
+    const res = await this.client.put(`/${this.resource}/${id}`, data, {
+      params
+    });
+    return res.data;
+  }
+  /**
+   * Deletes a model by its ID or other criteria.
+   * @param options - The options for deleting the model.
+   * @returns A promise that resolves when the model is deleted.
+   */
+  async delete(options) {
+    const { id, by, params } = options;
+    await this.client.delete(`/${this.resource}/${id}`, {
+      params: {
+        by: by || "id",
+        ...params
+      }
+    });
+  }
+};
+var OrderRepository = class extends ModelRepository {
+  /**
+   * Constructs a new OrderRepository instance.
+   * @param client - The AxiosInstance used for making HTTP requests.
+   */
+  constructor(client) {
+    super("orders", client);
+  }
+  /**
+   * Sends an order from an anonymous user.
+   * @param data - The data representing the order to be sent.
+   * @returns A Promise that resolves to the sent OrderEntity.
+   */
+  async send(data) {
+    const output = data;
+    const res = await this.client.post(`/${this.resource}/send`, output);
+    return res.data;
+  }
+  /**
+   * track the order by the order id
+   * it will return the order status and history
+   * @param options - The options for finding the model.
+   * @returns A promise that resolves to the found model.
+   */
+  async track(options) {
+    const { id, params } = options;
+    const res = await this.client.get(`/${this.resource}/${id}`, {
+      params: {
+        ...params
+      }
+    });
+    return res.data;
+  }
+};
+var ProductRepository = class extends ModelRepository {
+  /**
+   * Creates a new instance of the ProductRepository class.
+   * @param client - The AxiosInstance used for making HTTP requests.
+   */
+  constructor(client) {
+    super("products", client);
+  }
+};
+var StoreRepository = class extends ModelRepository {
+  /**
+   * Constructs a new StoreRepository instance.
+   * @param client The AxiosInstance used for making HTTP requests.
+   */
+  constructor(client) {
+    super("stores", client);
+  }
+  /**
+   * Creates a new Store entity.
+   * @param options The options for creating the Store entity.
+   * @returns A Promise that resolves to the created Store entity.
+   */
+  async create(options) {
+    const output = options.data;
+    return super.create({ ...options, data: output });
+  }
+};
+var UserRepository = class extends ModelRepository {
+  /**
+   * Constructs a new UserRepository instance.
+   * @param client - The AxiosInstance used for making HTTP requests.
+   */
+  constructor(client) {
+    super("users", client);
+    /**
+     * Represents the authentication response.
+     */
+    __publicField(this, "auth", null);
+  }
+  /**
+   * Signs in a user with the provided credentials.
+   * @param credentials - The user credentials.
+   * @returns A promise that resolves to the authentication response.
+   */
+  async signin(credentials) {
+    const output = credentials;
+    const res = await this.client.post(`/${this.resource}/auth/signin`, output);
+    this.auth = res.data;
+    return res.data;
+  }
+  /**
+   * Signs up a new user with the provided credentials.
+   * @param credentials - The user credentials.
+   * @returns A promise that resolves to the authentication response.
+   */
+  async signup(credentials) {
+    const output = credentials;
+    const res = await this.client.post(`/${this.resource}/auth/signup`, output);
+    this.auth = res.data;
+    return res.data;
+  }
+  /**
+   * Signs out the currently authenticated user.
+   * @returns A promise that resolves when the user is signed out.
+   */
+  async signout() {
+    this.auth = null;
+  }
+  /**
+   * Updates the authenticated user's data.
+   * @param data - The updated user data.
+   * @returns A promise that resolves to the updated user entity.
+   */
+  async updateMe(data) {
+    const output = data;
+    const res = await this.client.put(`/${this.resource}/auth`, output);
+    return res.data;
+  }
+};
+var NotifiableService = class {
+  /**
+   * Constructor for NotifiableService, initializes listeners as an empty Set.
+   * The Set ensures unique listeners and better management.
+   */
+  constructor() {
+    // Array of listeners (functions) to notify when changes occur
+    __publicField(this, "listeners", /* @__PURE__ */ new Set());
+  }
+  /**
+   * Adds a listener that gets called when `notify` is triggered.
+   * @param listener - The function to be called on notification.
+   * @returns The same listener for potential chaining or removal.
+   */
+  addListener(listener) {
+    this.listeners.add(listener);
+    return listener;
+  }
+  /**
+   * Removes a previously added listener.
+   * @param listener - The function to be removed from the listeners list.
+   */
+  removeListener(listener) {
+    this.listeners.delete(listener);
+  }
+  /**
+   * Notifies all registered listeners, passing the service instance.
+   * This allows listeners to react to changes.
+   */
+  notify() {
+    this.listeners.forEach((listener) => listener(this));
+  }
+  /**
+   * Clears all listeners, removing any references to them.
+   */
+  clearListeners() {
+    this.listeners.clear();
+  }
+};
+var CartService = class extends NotifiableService {
+  constructor() {
+    super(...arguments);
+    __publicField(this, "items", /* @__PURE__ */ new Map());
+    // Fast lookup of cart items
+    __publicField(this, "shippingMethod", null);
+    __publicField(this, "shippingAddress", {
+      name: null,
+      phone: null,
+      city: null,
+      state: null,
+      country: "dz",
+      type: "pickup"
+    });
+    __publicField(this, "cachedSubtotal", null);
+    // Cache for subtotal to avoid redundant calculations
+    __publicField(this, "currentItem", null);
+  }
+  /**
+   * Sets the current item to be managed in the cart.
+   * @param item - The item to be set as current.
+   */
+  setCurrentItem(item) {
+    this.currentItem = item;
+    if (this.has(this.currentItem.product.id)) {
+      this.items.set(this.currentItem.product.id, this.currentItem);
+    }
+    this.cachedSubtotal = null;
+    this.notify();
+  }
+  /**
+   * Update item by id.
+   * @param id - The id of the item to update.
+   * @param item - a partial item to update.
+   */
+  updateItem(id, item) {
+    const currentItem = this.items.get(id);
+    if (currentItem) {
+      this.items.set(id, { ...currentItem, ...item });
+      this.cachedSubtotal = null;
+      this.notify();
+    }
+  }
+  /**
+   * Update current item.
+   * @param item - a partial item to update.
+   */
+  updateCurrentItem(item) {
+    if (!this.currentItem)
+      return;
+    this.currentItem = { ...this.currentItem, ...item };
+    if (this.has(this.currentItem.product.id)) {
+      this.items.set(this.currentItem.product.id, this.currentItem);
+    }
+    this.cachedSubtotal = null;
+    this.notify();
+  }
+  /**
+   * Update shipping address.
+   * @param address - a partial address to update.
+   */
+  updateShippingAddress(address) {
+    this.shippingAddress = { ...this.shippingAddress, ...address };
+    this.cachedSubtotal = null;
+    this.notify();
+  }
+  /**
+   * Update shipping method.
+   * @param method - a partial shipping method to update.
+   */
+  updateShippingMethod(method) {
+    if (!this.shippingMethod)
+      return;
+    this.shippingMethod = { ...this.shippingMethod, ...method };
+    this.cachedSubtotal = null;
+    this.notify();
+  }
+  /**
+   * Retrieves the current item in the cart.
+   * @returns The current cart item or null if not set.
+   */
+  getCurrentItem() {
+    return this.currentItem;
+  }
+  /**
+   * Checks if the current item is already in the cart.
+   * @returns True if the current item is in the cart, false otherwise.
+   */
+  isCurrentItemInCart() {
+    return this.currentItem ? this.items.has(this.currentItem.product.id) : false;
+  }
+  /**
+   * Adds the current item to the cart if it's not already present.
+   */
+  addCurrentItemToCart() {
+    if (!this.currentItem || this.isCurrentItemInCart())
+      return;
+    this.add(this.currentItem);
+    this.cachedSubtotal = null;
+  }
+  /**
+   * Removes the current item from the cart if present.
+   */
+  removeCurrentItemFromCart() {
+    if (this.currentItem) {
+      this.remove(this.currentItem.product.id);
+    }
+  }
+  /**
+   * Toggles the current item's presence in the cart (add/remove).
+   */
+  toggleCurrentItemInCart() {
+    this.isCurrentItemInCart() ? this.removeCurrentItemFromCart() : this.addCurrentItemToCart();
+  }
+  /**
+   * Adds an item to the cart. If the item is already present, increments its quantity.
+   * @param item - The cart item to add.
+   */
+  add(item) {
+    const existingItem = this.items.get(item.product.id);
+    if (existingItem) {
+      existingItem.quantity += item.quantity;
+    } else {
+      this.items.set(item.product.id, item);
+    }
+    this.cachedSubtotal = null;
+    this.notifyIfChanged();
+  }
+  /**
+   * Checks if an item exists in the cart by product ID.
+   * @param itemId - The ID of the item to check.
+   * @returns True if the item exists in the cart, false otherwise.
+   */
+  has(itemId) {
+    return this.items.has(itemId);
+  }
+  /**
+   * Removes an item from the cart by product ID.
+   * @param itemId - The ID of the item to remove.
+   */
+  remove(itemId) {
+    if (this.items.delete(itemId)) {
+      this.cachedSubtotal = null;
+      this.notifyIfChanged();
+    }
+  }
+  /**
+   * Clears all items from the cart.
+   */
+  clear() {
+    if (this.items.size > 0) {
+      this.items.clear();
+      this.cachedSubtotal = null;
+      this.notify();
+    }
+  }
+  /**
+   * Retrieves the subtotal of the cart.
+   * @param withCurrentItem - Whether to include the current item in the subtotal.
+   * @returns The subtotal amount.
+   */
+  getSubtotal(withCurrentItem = true) {
+    if (this.cachedSubtotal === null) {
+      this.cachedSubtotal = Array.from(this.items.values()).reduce((sum, item) => {
+        return sum + this.getItemTotal(item);
+      }, 0);
+    }
+    if (withCurrentItem && this.currentItem && !this.has(this.currentItem.product.id)) {
+      return this.cachedSubtotal + this.getItemTotal(this.currentItem);
+    }
+    return this.cachedSubtotal;
+  }
+  /**
+   * Calculates the total price for a cart item.
+   * @param item - The cart item.
+   * @returns The total price for the item.
+   */
+  getItemTotal(item) {
+    const { product, variant, quantity } = item;
+    let price = product.price;
+    let discount = product.discount ?? 0;
+    if (variant) {
+      const parts = variant.split("/");
+      let currentVariant = product.variant;
+      for (const part of parts) {
+        if (!currentVariant)
+          break;
+        const option = currentVariant.options.find((o) => o.name === part);
+        if (!option)
+          break;
+        price = option.price ?? price;
+        discount = option.discount ?? discount;
+        currentVariant = option.child;
+      }
+    }
+    return (price - discount) * quantity;
+  }
+  /**
+   * Sets the shipping method.
+   * @param method - Either a store or a shipping method.
+   */
+  setShippingMethod(method) {
+    const store = (method == null ? void 0 : method.defaultShippingRates) ? method : null;
+    const shippingMethod = (method == null ? void 0 : method.rates) ? method : null;
+    if (store) {
+      this.shippingMethod = {
+        id: store.id,
+        name: store.name,
+        description: store.description,
+        logoUrl: store.logoUrl,
+        ondarkLogoUrl: store.ondarkLogoUrl,
+        price: 0,
+        forks: 0,
+        sourceId: store.id,
+        storeId: store.id,
+        rates: store.defaultShippingRates,
+        status: "published",
+        policy: "public",
+        verifiedAt: null,
+        createdAt: null,
+        updatedAt: null,
+        orders: [],
+        source: null
+      };
+      this.notify();
+    } else if (shippingMethod) {
+      this.shippingMethod = shippingMethod;
+      this.notify();
+    } else {
+      throw new Error("Invalid shipping method");
+    }
+  }
+  /**
+   * Retrieves the current shipping method.
+   * @returns The shipping method or null.
+   */
+  getShippingMethod() {
+    return this.shippingMethod;
+  }
+  /**
+   * Sets the shipping address for the cart.
+   * @param address - The shipping address.
+   */
+  setShippingAddress(address) {
+    if (this.shippingAddress.city !== address.city || this.shippingAddress.state !== address.state || this.shippingAddress.type !== address.type) {
+      this.shippingAddress = address;
+      this.notify();
+    }
+  }
+  /**
+   * Retrieves the current shipping address.
+   * @returns The shipping address.
+   */
+  getShippingAddress() {
+    return this.shippingAddress;
+  }
+  /**
+   * Calculates the shipping price based on the address and shipping method.
+   * @returns The shipping price or 0 if not applicable.
+   */
+  getShippingPrice() {
+    var _a;
+    if (!this.shippingMethod)
+      return 0;
+    if (!this.shippingAddress.state)
+      return this.shippingMethod.price ?? 0;
+    const stateIndex = Number.parseInt(this.shippingAddress.state, 10) - 1;
+    const rates = (_a = this.shippingMethod.rates) == null ? void 0 : _a[stateIndex];
+    return this.shippingAddress.type === "pickup" ? (rates == null ? void 0 : rates[0]) ?? 0 : (rates == null ? void 0 : rates[1]) ?? 0;
+  }
+  /**
+   * Calculates the total cost of the cart including shipping.
+   * @param withCurrentItem - Whether to include the current item in the total.
+   * @returns The total cost.
+   */
+  getTotal(withCurrentItem = true) {
+    return this.getSubtotal(withCurrentItem) + (this.getShippingPrice() ?? 0);
+  }
+  /**
+   * Retrieves all items in the cart.
+   * @returns An array of cart items.
+   */
+  getAll() {
+    return Array.from(this.items.values());
+  }
+  /**
+   * Checks if the cart is empty.
+   * @returns True if the cart is empty, otherwise false.
+   */
+  isEmpty() {
+    return this.items.size === 0;
+  }
+  /**
+   * Notifies listeners if the cart state has meaningfully changed.
+   */
+  notifyIfChanged() {
+    this.notify();
+  }
+};
+var FeeeF = class {
+  /**
+   * Constructs a new instance of the FeeeF class.
+   * @param {FeeeFConfig} config - The configuration object.
+   * @param {string} config.apiKey - The API key used for authentication.
+   * @param {AxiosInstance} config.client - The Axios instance used for making HTTP requests.
+   * @param {boolean | number} config.cache - The caching configuration. Set to `false` to disable caching, or provide a number to set the cache TTL in milliseconds.
+   */
+  //
+  constructor({ apiKey, client, cache, baseURL = "http://localhost:3333/api/v1" }) {
+    /**
+     * The API key used for authentication.
+     */
+    __publicField(this, "apiKey");
+    /**
+     * The Axios instance used for making HTTP requests.
+     */
+    __publicField(this, "client");
+    /**
+     * The repository for managing stores.
+     */
+    __publicField(this, "stores");
+    /**
+     * The repository for managing products.
+     */
+    __publicField(this, "products");
+    /**
+     * The repository for managing users.
+     */
+    __publicField(this, "users");
+    /**
+     * The repository for managing orders.
+     */
+    __publicField(this, "orders");
+    /**
+     * The cart service for managing the cart.
+     */
+    __publicField(this, "cart");
+    console.log(cache);
+    this.apiKey = apiKey;
+    this.client = client || axios;
+    this.client.defaults.baseURL = baseURL;
+    this.stores = new StoreRepository(this.client);
+    this.products = new ProductRepository(this.client);
+    this.users = new UserRepository(this.client);
+    this.orders = new OrderRepository(this.client);
+    this.cart = new CartService();
+  }
+};
+var VariantOptionType = /* @__PURE__ */ ((VariantOptionType2) => {
+  VariantOptionType2["color"] = "color";
+  VariantOptionType2["image"] = "image";
+  VariantOptionType2["text"] = "text";
+  return VariantOptionType2;
+})(VariantOptionType || {});
+var EmbaddedContactType = /* @__PURE__ */ ((EmbaddedContactType2) => {
+  EmbaddedContactType2["phone"] = "phone";
+  EmbaddedContactType2["email"] = "email";
+  EmbaddedContactType2["facebook"] = "facebook";
+  EmbaddedContactType2["twitter"] = "twitter";
+  EmbaddedContactType2["instagram"] = "instagram";
+  EmbaddedContactType2["linkedin"] = "linkedin";
+  EmbaddedContactType2["website"] = "website";
+  EmbaddedContactType2["whatsapp"] = "whatsapp";
+  EmbaddedContactType2["telegram"] = "telegram";
+  EmbaddedContactType2["signal"] = "signal";
+  EmbaddedContactType2["viber"] = "viber";
+  EmbaddedContactType2["skype"] = "skype";
+  EmbaddedContactType2["zoom"] = "zoom";
+  EmbaddedContactType2["other"] = "other";
+  return EmbaddedContactType2;
+})(EmbaddedContactType || {});
 const TextButton = ({ children, href, target, className }) => {
   var child = /* @__PURE__ */ jsx(
     "button",
@@ -3595,7 +4212,7 @@ async function getProducts(storeId) {
   if (_storeProducts[storeId] && false)
     return _storeProducts[storeId];
   var products = await ff.products.list({
-    limit: 100,
+    limit: 200,
     params: {
       store_id: storeId
     }
@@ -3630,7 +4247,7 @@ const routes = [
       },
       {
         path: "lazy",
-        lazy: () => import("./assets/lazy-4855271e.mjs")
+        lazy: () => import("./assets/lazy-a48ab011.mjs")
       },
       {
         path: "redirect",
@@ -3675,13 +4292,14 @@ function Home() {
   }, []);
   const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(null);
   function filteredProducts() {
-    return products.filter(
-      (product) => {
-        var _a2;
-        return !selectedCategory ? true : ((_a2 = product.category) == null ? void 0 : _a2.name) == (selectedCategory == null ? void 0 : selectedCategory.name);
-      }
-    );
+    return products.filter((product) => {
+      var _a2;
+      const matchesCategory = !selectedCategory ? true : ((_a2 = product.category) == null ? void 0 : _a2.name) == (selectedCategory == null ? void 0 : selectedCategory.name);
+      const matchesSearchQuery = !searchQuery ? true : product.name.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearchQuery;
+    });
   }
   return /* @__PURE__ */ jsxs(Fragment, { children: [
     /* @__PURE__ */ jsx(
@@ -3709,16 +4327,13 @@ function Home() {
     /* @__PURE__ */ jsxs("div", { className: "text-center relative max-w-screen-xl mx-auto px-4  sm:px-6 py-10 lg:px-8", children: [
       /* @__PURE__ */ jsx(AsynxWave, { className: "pointer-events-none scale-150 z-0 absolute inset-0 aspect-square h-full m-auto blur-xl" }),
       /* @__PURE__ */ jsxs("div", { className: "z-10 relative", children: [
-        /* @__PURE__ */ jsxs("div", { className: "relative flex items-center justify-center", children: [
-          /* @__PURE__ */ jsx(
-            "h4",
-            {
-              className: " absolute\n          font-extrabold text-base dark:text-gray-50 tracking-wide uppercase",
-              children: store == null ? void 0 : store.name
-            }
-          ),
-          /* @__PURE__ */ jsx(AsynxWave, {})
-        ] }),
+        /* @__PURE__ */ jsx("div", { className: "relative flex items-center justify-center", children: /* @__PURE__ */ jsx(
+          "h4",
+          {
+            className: " absolute\n          font-extrabold text-base dark:text-gray-50 tracking-wide uppercase",
+            children: store == null ? void 0 : store.name
+          }
+        ) }),
         /* @__PURE__ */ jsx("h1", { className: "title-font font-light mt-1 text-4xl text-gray-900 dark:text-white sm:text-5xl sm:tracking-tight lg:text-4xl", children: store == null ? void 0 : store.title }),
         /* @__PURE__ */ jsx(
           "p",
@@ -3727,7 +4342,17 @@ function Home() {
             children: store == null ? void 0 : store.description
           }
         )
-      ] })
+      ] }),
+      /* @__PURE__ */ jsx("div", { className: "mt-8", children: /* @__PURE__ */ jsx(
+        "input",
+        {
+          type: "text",
+          placeholder: "ابحث عن منتج",
+          value: searchQuery || "",
+          onChange: (e) => setSearchQuery(e.target.value),
+          className: "w-[300px] p-2 border border-gray-300 rounded-md"
+        }
+      ) })
     ] }),
     /* @__PURE__ */ jsx("div", { className: "h-4" }),
     /* @__PURE__ */ jsx("div", { className: "container", children: /* @__PURE__ */ jsx("div", { className: "grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4", children: (_a = store == null ? void 0 : store.categories) == null ? void 0 : _a.map((category, index) => /* @__PURE__ */ jsx(
