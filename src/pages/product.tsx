@@ -678,9 +678,12 @@ function Product({ store, product }: { store: StoreEntity, product: ProductEntit
 
                                 <div className="flex-grow"></div>
 
-                                <span className="px-1  text-gray-400 text-lg">
-                                    يتوفر {getQuantity()}
-                                </span>
+                                {
+                                    getQuantity() != 0 && getQuantity() != null &&
+                                    <span className="px-1  text-gray-400 text-lg">
+                                        يتوفر {getQuantity()}
+                                    </span>
+                                }
 
 
                             </div>

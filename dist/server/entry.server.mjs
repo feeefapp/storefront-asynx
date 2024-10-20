@@ -3114,7 +3114,7 @@ function Product({ store, product }) {
               getCurrencySymbolByStore(store)
             ] }),
             /* @__PURE__ */ jsx("div", { className: "flex-grow" }),
-            /* @__PURE__ */ jsxs("span", { className: "px-1  text-gray-400 text-lg", children: [
+            getQuantity() != 0 && getQuantity() != null && /* @__PURE__ */ jsxs("span", { className: "px-1  text-gray-400 text-lg", children: [
               "يتوفر ",
               getQuantity()
             ] })
