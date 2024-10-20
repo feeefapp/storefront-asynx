@@ -106,7 +106,7 @@ function RenderVariantGroup({ variantGroup, path, onPathChange, onSelect }: {
                         <span className="px-1">{getVariant(selected!)?.name}</span>
                     </span>
                 }{
-                    getVariant(selected!)?.stock !== undefined &&
+                    getVariant(selected!)?.stock &&
                     <span className="  text-primary rounded-full px-2">
                         {getVariant(selected!)?.stock} متوفر
                     </span>

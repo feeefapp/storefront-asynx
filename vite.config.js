@@ -12,7 +12,7 @@ const _plugins = [rollupReplace({
     "process.env.NODE_ENV": JSON.stringify("development")
   }
 }), react()];
-// _plugins.unshift(MillionLint.vite())
+_plugins.unshift(MillionLint.vite())
 export default defineConfig({
   server: {
     port: 3000
